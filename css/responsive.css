@@ -1,0 +1,87 @@
+/* ==========================================================================
+   DMC HOSPITAL EXECUTIVE DASHBOARD - RESPONSIVE STYLES (responsive.css)
+   ========================================================================== */
+
+/* Laptops & Desktops under 1200px */
+@media (max-width: 1200px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .analytics-grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tablets under 992px */
+@media (max-width: 992px) {
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+    z-index: 100;
+  }
+
+  .app-sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+
+  .sidebar-toggle-btn {
+    display: inline-flex !important;
+  }
+
+  .app-header {
+    padding: 0 var(--space-md);
+  }
+
+  .dashboard-content {
+    padding: var(--space-md);
+  }
+}
+
+/* Mobile Devices under 768px */
+@media (max-width: 768px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header-meta {
+    display: none;
+  }
+
+  .filter-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .preset-pill-group {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+  }
+
+  .preset-pill {
+    flex: 1;
+    text-align: center;
+  }
+
+  .select-custom {
+    width: 100%;
+  }
+
+  .btn-text-mobile-hide {
+    display: none;
+  }
+
+  .donut-container {
+    max-width: 260px;
+  }
+
+  .donut-center-number {
+    font-size: 1.8rem;
+  }
+}

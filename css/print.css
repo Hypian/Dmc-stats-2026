@@ -1,0 +1,113 @@
+/* ==========================================================================
+   DMC HOSPITAL EXECUTIVE DASHBOARD - PRINT & PDF STYLES (print.css)
+   Clean executive print layout for executive reports and PDF exports
+   ========================================================================== */
+
+@media print {
+  /* Hide interactive controls, buttons, sidebar, and modals */
+  .app-sidebar,
+  .sidebar-toggle-btn,
+  .header-right,
+  .filter-toolbar,
+  .chart-card-actions,
+  .modal-overlay,
+  #toastContainer,
+  .btn,
+  .dropzone-box {
+    display: none !important;
+  }
+
+  /* Force light background and clean borders */
+  body, .app-main, .app-wrapper, .dashboard-content, .chart-card, .kpi-card {
+    background-color: #FFFFFF !important;
+    color: #1A202C !important;
+    box-shadow: none !important;
+  }
+
+  .app-main {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+
+  .dashboard-content {
+    padding: 10mm 15mm !important;
+    gap: 15px !important;
+    max-width: 100% !important;
+  }
+
+  .app-header {
+    border-bottom: 2px solid #E84A2D !important;
+    padding: 10px 0 !important;
+    height: auto !important;
+  }
+
+  .header-title h1 {
+    font-size: 1.5rem !important;
+    color: #E84A2D !important;
+  }
+
+  .header-meta {
+    display: block !important;
+    color: #4A5568 !important;
+    margin-top: 4px;
+  }
+
+  /* 4-column KPI grid prints cleanly */
+  .kpi-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 12px !important;
+    page-break-inside: avoid;
+  }
+
+  .kpi-card {
+    border: 1px solid #CBD5E0 !important;
+    padding: 12px !important;
+    break-inside: avoid;
+  }
+
+  .kpi-value {
+    font-size: 1.6rem !important;
+  }
+
+  .chart-card {
+    border: 1px solid #E2E8F0 !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 15px;
+  }
+
+  .analytics-grid-2col,
+  .analytics-grid-2-1,
+  .analytics-grid-1-2,
+  .analytics-grid-3col {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 15px !important;
+  }
+
+  /* Table styles in print */
+  .hospital-table th {
+    background-color: #EDF2F7 !important;
+    color: #2D3748 !important;
+    border-bottom: 2px solid #CBD5E0 !important;
+  }
+
+  .hospital-table td {
+    border-bottom: 1px solid #E2E8F0 !important;
+    font-size: 0.8rem !important;
+    padding: 6px 10px !important;
+  }
+
+  /* Page break rules */
+  .page-break-before {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  /* Footer for print */
+  .app-footer {
+    border-top: 1px solid #CBD5E0 !important;
+    padding: 10px 0 !important;
+    font-size: 0.75rem !important;
+    color: #718096 !important;
+  }
+}
