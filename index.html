@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DMC Dream Medical Center Hospital — Clinical Statistics & Performance Dashboard 2026</title>
-  <meta name="description" content="Official executive dashboard for DMC Dream Medical Center Hospital displaying patient admissions, department performance, maternity outcomes, and mortality records from Excel.">
+  <title>Dream Medical Center Hospital — Clinical Statistics & Performance Dashboard 2026</title>
+  <meta name="description" content="Official executive dashboard for Dream Medical Center Hospital displaying patient admissions, department performance, maternity outcomes, and mortality records from Excel.">
   <link rel="icon" type="image/png" href="assets/logo_icon.png">
 
   <!-- Google Fonts -->
@@ -37,8 +37,8 @@
     <aside class="app-sidebar" aria-label="Main Navigation">
       <div class="sidebar-brand">
         <div class="brand-logo-wrapper">
-          <img src="assets/logo_transparent.png" alt="DMC Dream Medical Center Hospital" class="brand-logo-img logo-light-mode">
-          <img src="assets/logo_dark_mode.png" alt="DMC Dream Medical Center Hospital" class="brand-logo-img logo-dark-mode">
+          <img src="assets/logo_transparent.png" alt="Dream Medical Center Hospital" class="brand-logo-img logo-light-mode">
+          <img src="assets/logo_dark_mode.png" alt="Dream Medical Center Hospital" class="brand-logo-img logo-dark-mode">
         </div>
       </div>
 
@@ -70,7 +70,7 @@
           <span>Excel Data Verified</span>
         </div>
         <div>Jan – Aug 2026 Records</div>
-        <div>DMC Dream Medical Center</div>
+        <div>Dream Medical Center</div>
       </div>
     </aside>
 
@@ -88,30 +88,12 @@
             <div class="header-meta">
               <span><i class="fas fa-calendar-alt"></i> Jan 01 – Aug 31, 2026</span>
               <span><i class="fas fa-clock"></i> <span id="liveClockText">Live</span></span>
-              <span><i class="fas fa-file-excel"></i> <code>PATIENTS_STATISTICS JAN TO JULY 2026.xlsx</code></span>
+              <span><i class="fas fa-file-excel"></i> <code>PATIENTS STATISTICS - JAN TO AUG 2026.xlsx</code></span>
             </div>
           </div>
         </div>
 
         <div class="header-right">
-          <!-- Live Excel File Upload Modal Button -->
-          <button id="openUploadModalBtn" class="btn btn-outline" title="Upload updated hospital Excel workbook">
-            <i class="fas fa-file-excel" style="color: var(--primary);"></i>
-            <span class="btn-text-mobile-hide">Import Excel</span>
-          </button>
-
-          <!-- Share / Snapshot Button -->
-          <button id="shareDashboardBtn" class="btn btn-outline" title="Copy statistics snapshot to clipboard">
-            <i class="fas fa-share-nodes"></i>
-            <span class="btn-text-mobile-hide">Share</span>
-          </button>
-
-          <!-- PDF / Print Button -->
-          <button id="printReportBtn" class="btn btn-primary" title="Export as PDF / Print Report">
-            <i class="fas fa-file-pdf"></i>
-            <span class="btn-text-mobile-hide">Export PDF</span>
-          </button>
-
           <!-- Dark / Light Theme Toggle -->
           <button id="themeToggleBtn" class="btn btn-outline btn-icon-only" aria-label="Toggle color theme" title="Toggle theme">
             <i class="fas fa-moon"></i>
@@ -174,7 +156,7 @@
               <div class="alert-content">
                 <i class="fas fa-exclamation-triangle fa-lg"></i>
                 <div>
-                  <strong>Obstetric Delivery Notice:</strong> Caesarean Section rate is <strong>55.6%</strong> (483 CS of 868 deliveries) vs <strong>44.4%</strong> Spontaneous Vaginal Delivery (386 SVD).
+                  <strong>Obstetric Delivery Notice:</strong> Caesarean Section rate is <strong>56.1%</strong> (543 CS of 968 deliveries) vs <strong>43.9%</strong> Spontaneous Vaginal Delivery (426 SVD).
                 </div>
               </div>
               <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss alert">&times;</button>
@@ -184,7 +166,7 @@
               <div class="alert-content">
                 <i class="fas fa-circle-info fa-lg"></i>
                 <div>
-                  <strong>Facility Inpatient Safety:</strong> <strong>5 in-facility deaths</strong> recorded across 3,120 inpatient admissions (0.16% mortality rate): 3 stillbirths macerated in Maternity, 1 internal medicine, 1 emergency.
+                  <strong>Facility Inpatient Safety:</strong> <strong>6 in-facility deaths</strong> recorded across 3,120 inpatient admissions (0.19% mortality rate): 4 stillbirths macerated in Maternity, 1 internal medicine, 1 emergency.
                 </div>
               </div>
               <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss alert">&times;</button>
@@ -244,15 +226,15 @@
                 </div>
               </div>
               <div class="kpi-value-row">
-                <span class="kpi-value" id="kpiDeliveriesCount">868</span>
+                <span class="kpi-value" id="kpiDeliveriesCount">968</span>
                 <span class="kpi-unit">births</span>
               </div>
               <div style="height: 36px; width: 100%; margin: 6px 0;">
                 <canvas id="delSparkline"></canvas>
               </div>
               <div class="kpi-footer">
-                <span class="kpi-badge badge-positive"><span id="kpiLiveBirthsSub">877 Live Births</span></span>
-                <span class="kpi-subtext">Jan – Jul 2026</span>
+                <span class="kpi-badge badge-positive"><span id="kpiLiveBirthsSub">977 Live Births</span></span>
+                <span class="kpi-subtext">Jan – Aug 2026</span>
               </div>
             </div>
 
@@ -265,14 +247,14 @@
                 </div>
               </div>
               <div class="kpi-value-row">
-                <span class="kpi-value" id="kpiCSRate">55.6%</span>
+                <span class="kpi-value" id="kpiCSRate">56.1%</span>
                 <span class="kpi-unit">ratio</span>
               </div>
               <div style="height: 36px; width: 100%; margin: 6px 0;">
                 <canvas id="csSparkline"></canvas>
               </div>
               <div class="kpi-footer">
-                <span class="kpi-badge badge-warning"><span id="kpiCSRatioSub">483 CS · 386 SVD</span></span>
+                <span class="kpi-badge badge-warning"><span id="kpiCSRatioSub">543 CS · 426 SVD</span></span>
                 <span class="kpi-subtext">Obstetric Service</span>
               </div>
             </div>
@@ -412,7 +394,7 @@
                   <p>Caesarean Section (CS) vs Spontaneous Vaginal Delivery (SVD)</p>
                 </div>
                 <div class="chart-card-actions">
-                  <span class="kpi-badge badge-warning">868 Deliveries</span>
+                  <span class="kpi-badge badge-warning">968 Deliveries</span>
                 </div>
               </div>
               <div class="donut-container">
@@ -426,10 +408,10 @@
               <div class="chart-card-header">
                 <div class="chart-card-title">
                   <h3>Multi-Year Historical Deliveries (2019 – 2026)</h3>
-                  <p>8-Year longitudinal evolution (Sheet 3: 7,815 deliveries total)</p>
+                  <p>8-Year longitudinal evolution (Sheet 3: 7,915 deliveries total)</p>
                 </div>
                 <div class="chart-card-actions">
-                  <span class="kpi-badge badge-positive">7,815 Total</span>
+                  <span class="kpi-badge badge-positive">7,915 Total</span>
                 </div>
               </div>
               <div style="height: 310px; width: 100%;">
@@ -442,7 +424,7 @@
           <div class="chart-card">
             <div class="chart-card-header">
               <div class="chart-card-title">
-                <h3>Maternity Monthly Performance Register (Jan – Jul 2026)</h3>
+                <h3>Maternity Monthly Performance Register (Jan – Aug 2026)</h3>
                 <p>Deliveries, Live Births, Caesarean Sections, and SVD from Sheet: BABIES TOTAL</p>
               </div>
             </div>
@@ -458,7 +440,7 @@
             <div class="chart-card-header">
               <div class="chart-card-title">
                 <h3>Multi-Year Historical Deliveries Register (2019 – 2026)</h3>
-                <p>8-Year longitudinal tracking from Sheet: BABIES TOTAL (7,815 cumulative deliveries)</p>
+                <p>8-Year longitudinal tracking from Sheet: BABIES TOTAL (7,915 cumulative deliveries)</p>
               </div>
             </div>
             <div class="table-responsive-wrapper">
@@ -482,7 +464,7 @@
                   <p>Detailed deaths recorded in health facility register (Sheet 4)</p>
                 </div>
                 <div class="chart-card-actions">
-                  <span class="kpi-badge badge-positive">0.16% Mortality</span>
+                  <span id="mortalityRatePillBadge" class="kpi-badge badge-positive">0.19% Mortality</span>
                 </div>
               </div>
               <div class="donut-container">
@@ -496,7 +478,7 @@
               <div class="chart-card-header">
                 <div class="chart-card-title">
                   <h3>Documented Clinical Mortality Log</h3>
-                  <p>Exact records from Sheet: Death (5 facility mortalities recorded Jan–Jul 2026)</p>
+                  <p>Exact records from Sheet: Death (6 facility mortalities recorded Jan–Aug 2026)</p>
                 </div>
               </div>
               <div class="table-responsive-wrapper">
@@ -550,11 +532,11 @@
       <!-- App Footer -->
       <footer class="app-footer">
         <div>
-          &copy; 2026 <strong>DMC Diagnostic & Medical Center</strong>. Executive Hospital Performance Report.
+          &copy; 2026 <strong>Dream Medical Center Hospital</strong>. Executive Performance Report.
         </div>
         <div class="footer-source">
           <i class="fas fa-database"></i>
-          <span>Source File: <code>PATIENTS_STATISTICS JAN TO JULY 2026.xlsx</code> · Verified Accurate</span>
+          <span>Source File: <code>PATIENTS STATISTICS - JAN TO AUG 2026.xlsx</code> · Verified Accurate</span>
         </div>
       </footer>
 
@@ -570,7 +552,7 @@
       </div>
       <div class="modal-body">
         <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 0.9rem;">
-          Upload an updated workbook (e.g. <code>PATIENTS_STATISTICS JAN TO JULY 2026.xlsx</code> or newer additions). The dashboard will parse the sheets and immediately refresh all charts, KPIs, and tables.
+          Upload an updated workbook (e.g. <code>PATIENTS STATISTICS - JAN TO AUG 2026.xlsx</code> or newer additions). The dashboard will parse the sheets and immediately refresh all charts, KPIs, and tables.
         </p>
 
         <div class="dropzone-box" id="excelDropZone" onclick="document.getElementById('excelFileInput').click()">

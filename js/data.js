@@ -10,14 +10,14 @@
 
 const HOSPITAL_RAW_DATA = {
   metadata: {
-    hospitalName: "DMC Dream Medical Center Hospital",
+    hospitalName: "Dream Medical Center Hospital",
     reportTitle: "Hospital Statistics & Clinical Performance Report",
     year: 2026,
     periodCovered: "January - August 2026",
     months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
     allMonths: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     lastUpdated: "2026-09-05",
-    sourceFile: "PATIENTS_STATISTICS JAN TO JULY 2026.xlsx"
+    sourceFile: "PATIENTS STATISTICS - JAN TO AUG 2026.xlsx"
   },
 
   // Sheet 1: OUT PATIENT PER DEPARTEMENT (Jan - Aug 2026)
@@ -52,7 +52,7 @@ const HOSPITAL_RAW_DATA = {
 
   // Sheet 3: BABIES TOTAL
   maternity: {
-    // Monthly 2026 Deliveries (Jan - Jul 2026)
+    // Monthly 2026 Deliveries (Jan - Aug 2026)
     monthly: [
       { month: "Jan", period: "2026-01-31", deliveries: 116, liveBirths: 115, deaths: 1, deathReason: "Still births macerated", cs: 61, svd: 55 },
       { month: "Feb", period: "2026-02-28", deliveries: 114, liveBirths: 115, deaths: 0, deathReason: "None", cs: 59, svd: 55 },
@@ -60,7 +60,8 @@ const HOSPITAL_RAW_DATA = {
       { month: "Apr", period: "2026-04-30", deliveries: 132, liveBirths: 135, deaths: 0, deathReason: "None", cs: 72, svd: 61 },
       { month: "May", period: "2026-05-31", deliveries: 133, liveBirths: 137, deaths: 0, deathReason: "None", cs: 62, svd: 71 },
       { month: "Jun", period: "2026-06-30", deliveries: 112, liveBirths: 115, deaths: 0, deathReason: "None", cs: 72, svd: 40 },
-      { month: "Jul", period: "2026-07-31", deliveries: 126, liveBirths: 125, deaths: 2, deathReason: "Still births macerated", cs: 75, svd: 51 }
+      { month: "Jul", period: "2026-07-31", deliveries: 126, liveBirths: 125, deaths: 2, deathReason: "Still births macerated", cs: 75, svd: 51 },
+      { month: "Aug", period: "2026-08-31", deliveries: 100, liveBirths: 100, deaths: 1, deathReason: "Still births macerated", cs: 60, svd: 40 }
     ],
     // Historical Multi-Year Record (2019 to 2026) from Sheet 3
     historical: [
@@ -71,7 +72,7 @@ const HOSPITAL_RAW_DATA = {
       { year: "2023", deliveries: 1252, liveBirths: 1248, cs: 779, svd: 473 },
       { year: "2024", deliveries: 1441, liveBirths: 1444, cs: 854, svd: 587 },
       { year: "2025", deliveries: 1437, liveBirths: 1439, cs: 824, svd: 613 },
-      { year: "2026 (7M)", deliveries: 868, liveBirths: 877, cs: 483, svd: 386 }
+      { year: "2026 (8M)", deliveries: 968, liveBirths: 977, cs: 543, svd: 426 }
     ]
   },
 
@@ -80,7 +81,8 @@ const HOSPITAL_RAW_DATA = {
     { date: "2026-01-31", month: "Jan", count: 1, age: "0", department: "Maternity", circumstance: "Still births macerated" },
     { date: "2026-05-31", month: "May", count: 1, age: "Unspecified", department: "Internal medecine", circumstance: "Natural disease ( cancer)" },
     { date: "2026-06-30", month: "Jun", count: 1, age: "Unspecified", department: "Emergency", circumstance: "Natural disease" },
-    { date: "2026-07-31", month: "Jul", count: 2, age: "Unspecified", department: "Maternity", circumstance: "Still births macerated" }
+    { date: "2026-07-31", month: "Jul", count: 2, age: "0", department: "Maternity", circumstance: "Still births macerated" },
+    { date: "2026-08-31", month: "Aug", count: 1, age: "0", department: "Maternity", circumstance: "Still births macerated" }
   ]
 };
 
@@ -183,10 +185,15 @@ const HospitalAnalytics = {
     return hospitalData.mortality.reduce((acc, d) => acc + d.count, 0);
   },
 
+  // Alias for getDeathsTotal
+  getMortalityTotal(periodFilter) {
+    return this.getDeathsTotal(periodFilter);
+  },
+
   // Inpatient Mortality Rate (% of inpatients)
   getMortalityRate(periodFilter) {
     const totalIPD = this.getIPDTotal(periodFilter);
     const totalDeaths = this.getDeathsTotal(periodFilter);
-    return totalIPD > 0 ? ((totalDeaths / totalIPD) * 100).toFixed(2) : "0.16";
+    return totalIPD > 0 ? ((totalDeaths / totalIPD) * 100).toFixed(2) : "0.00";
   }
 };

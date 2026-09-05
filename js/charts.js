@@ -126,6 +126,11 @@ const HospitalCharts = {
         maintainAspectRatio: true,
         cutout: '66%',
         animation: { duration: 800 },
+        onHover: (evt, el) => {
+          if (evt.native && evt.native.target) {
+            evt.native.target.style.cursor = el.length ? 'pointer' : 'default';
+          }
+        },
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -147,9 +152,8 @@ const HospitalCharts = {
         onClick: (evt, elements) => {
           if (elements.length > 0) {
             const index = elements[0].index;
-            const dept = hospitalData.inpatient[index];
             if (typeof window.showDepartmentDrilldown === 'function') {
-              window.showDepartmentDrilldown('inpatient', dept.name);
+              window.showDepartmentDrilldown('inpatient', labels[index]);
             }
           }
         }
@@ -181,18 +185,9 @@ const HospitalCharts = {
 
     const sorted = [...hospitalData.outpatient].sort((a, b) => getVal(b) - getVal(a));
 
-    const top6 = sorted.slice(0, 6);
-    const rest = sorted.slice(6);
-
-    const labels = top6.map(d => d.name);
-    const dataVals = top6.map(d => getVal(d));
-    const colors = top6.map(d => d.color);
-
-    const restTotal = rest.reduce((acc, d) => acc + getVal(d), 0);
-
-    labels.push('OTHER SERVICES');
-    dataVals.push(restTotal);
-    colors.push('#8C7D77');
+    const labels = sorted.map(d => d.name);
+    const dataVals = sorted.map(d => getVal(d));
+    const colors = sorted.map(d => d.color);
 
     const totalOPD = dataVals.reduce((a, b) => a + b, 0);
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -214,6 +209,11 @@ const HospitalCharts = {
         maintainAspectRatio: true,
         cutout: '66%',
         animation: { duration: 800 },
+        onHover: (evt, el) => {
+          if (evt.native && evt.native.target) {
+            evt.native.target.style.cursor = el.length ? 'pointer' : 'default';
+          }
+        },
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -280,6 +280,19 @@ const HospitalCharts = {
         maintainAspectRatio: true,
         cutout: '66%',
         animation: { duration: 800 },
+        onHover: (evt, el) => {
+          if (evt.native && evt.native.target) {
+            evt.native.target.style.cursor = el.length ? 'pointer' : 'default';
+          }
+        },
+        onClick: (evt, elements) => {
+          if (elements.length > 0) {
+            const index = elements[0].index;
+            if (typeof window.showDepartmentDrilldown === 'function') {
+              window.showDepartmentDrilldown('delivery', labels[index]);
+            }
+          }
+        },
         plugins: {
           legend: { display: false },
           tooltip: {
@@ -361,6 +374,19 @@ const HospitalCharts = {
         maintainAspectRatio: true,
         cutout: '66%',
         animation: { duration: 800 },
+        onHover: (evt, el) => {
+          if (evt.native && evt.native.target) {
+            evt.native.target.style.cursor = (el.length && hasData) ? 'pointer' : 'default';
+          }
+        },
+        onClick: (evt, elements) => {
+          if (elements.length > 0 && hasData) {
+            const index = elements[0].index;
+            if (typeof window.showDepartmentDrilldown === 'function') {
+              window.showDepartmentDrilldown('mortality', labels[index]);
+            }
+          }
+        },
         plugins: {
           legend: { display: false },
           donutCenterText: {

@@ -369,29 +369,24 @@ const HospitalApp = {
     this.animateValue('kpiDeliveriesCount', deliveriesTotal);
     const liveBirthsEl = document.getElementById('kpiLiveBirthsSub');
     if (liveBirthsEl) {
-      if (pf === 7) {
-        liveBirthsEl.textContent = `Pending (Jul: 125)`;
-      } else {
-        liveBirthsEl.textContent = `${liveBirthsTotal.toLocaleString()} Live Births`;
-      }
+      liveBirthsEl.textContent = `${liveBirthsTotal.toLocaleString()} Live Births`;
     }
 
     const csStats = HospitalAnalytics.getCSStats(pf);
     const csRateEl = document.getElementById('kpiCSRate');
     if (csRateEl) {
-      if (pf === 7) {
-        csRateEl.textContent = `N/A`;
-      } else {
-        csRateEl.textContent = `${csStats.rate}%`;
-      }
+      csRateEl.textContent = `${csStats.rate}%`;
     }
     const csRatioEl = document.getElementById('kpiCSRatioSub');
     if (csRatioEl) {
-      if (pf === 7) {
-        csRatioEl.textContent = `Reported Jan–Jul`;
-      } else {
-        csRatioEl.textContent = `${csStats.cs.toLocaleString()} CS · ${csStats.svd.toLocaleString()} SVD`;
-      }
+      csRatioEl.textContent = `${csStats.cs.toLocaleString()} CS · ${csStats.svd.toLocaleString()} SVD`;
+    }
+
+    const mortBadge = document.getElementById('mortalityRatePillBadge');
+    if (mortBadge) {
+      const mortDeaths = HospitalAnalytics.getMortalityTotal(pf);
+      const mortRate = ipdTotal > 0 ? ((mortDeaths / ipdTotal) * 100).toFixed(2) : '0.00';
+      mortBadge.textContent = `${mortRate}% Mortality`;
     }
   },
 
@@ -605,7 +600,7 @@ const HospitalApp = {
       </tbody>
       <tfoot>
         <tr>
-          <td>TOTAL (JAN - JUL 2026)</td>
+          <td>TOTAL (JAN - AUG 2026)</td>
           <td class="num-mono" style="text-align: right;">${totDel.toLocaleString()}</td>
           <td class="num-mono" style="text-align: right;">${totLive.toLocaleString()}</td>
           <td class="num-mono" style="text-align: right; color: var(--accent); font-weight: 800;">${totCS.toLocaleString()}</td>
@@ -622,7 +617,7 @@ const HospitalApp = {
 
   /**
    * Render Multi-Year Maternity Historical Record (2019 - 2026)
-   * Source: Sheet 3: BABIES TOTAL (Deliveries/Babies from 2019 up to July 2026)
+   * Source: Sheet 3: BABIES TOTAL (Deliveries/Babies from 2019 up to August 2026)
    */
   renderMaternityHistoricalTable() {
     const table = document.getElementById('maternityHistoricalTable');
@@ -726,9 +721,9 @@ const HospitalApp = {
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="2">TOTAL IN-FACILITY DEATHS (JAN – JUL 2026)</td>
+          <td colspan="2">TOTAL IN-FACILITY DEATHS (JAN – AUG 2026)</td>
           <td class="num-mono" style="text-align: right; font-weight: 800; color: var(--danger); font-size: 1.05rem;">${totalDeaths}</td>
-          <td colspan="3" style="color: var(--text-muted); font-size: 0.82rem;">0.16% mortality rate across 3,120 inpatient admissions (Sheet 4: Death)</td>
+          <td colspan="3" style="color: var(--text-muted); font-size: 0.82rem;">${((totalDeaths / HospitalAnalytics.getIPDTotal()) * 100).toFixed(2)}% mortality rate across ${HospitalAnalytics.getIPDTotal().toLocaleString()} inpatient admissions (Sheet 4: Death)</td>
         </tr>
       </tfoot>
     `;
@@ -803,6 +798,165 @@ const HospitalApp = {
     const modalBody = document.getElementById('drilldownModalBody');
     if (!modal || !modalBody) return;
 
+    // 1. Mortality Incident Drilldown
+    if (type === 'mortality') {
+      modalTitle.textContent = `${deptName} — Clinical Mortalities Detail`;
+      const matching = hospitalData.mortality.filter(m => {
+        const full = `${m.department} (${m.circumstance})`;
+        return full.toLowerCase().includes(deptName.toLowerCase()) || deptName.toLowerCase().includes(m.department.toLowerCase());
+      });
+      const deathsCount = matching.reduce((s, m) => s + m.count, 0);
+      const totalFacilityDeaths = hospitalData.mortality.reduce((s, m) => s + m.count, 0);
+      const pctOfDeaths = totalFacilityDeaths > 0 ? ((deathsCount / totalFacilityDeaths) * 100).toFixed(1) : 0;
+
+      modalBody.innerHTML = `
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px;">
+          <div style="padding: 14px; background: var(--bg-surface-alt); border-radius: 8px; border: 1px solid var(--border-light);">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Recorded Mortalities</div>
+            <div style="font-size: 1.8rem; font-weight: 700; font-family: var(--font-mono); color: var(--danger); margin-top: 4px;">
+              ${deathsCount} ${deathsCount === 1 ? 'Death' : 'Deaths'}
+            </div>
+          </div>
+          <div style="padding: 14px; background: var(--bg-surface-alt); border-radius: 8px; border: 1px solid var(--border-light);">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Share of Facility Deaths</div>
+            <div style="font-size: 1.8rem; font-weight: 700; font-family: var(--font-mono); color: var(--primary); margin-top: 4px;">
+              ${pctOfDeaths}%
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">of all ${totalFacilityDeaths} recorded facility deaths</div>
+          </div>
+          <div style="padding: 14px; background: var(--bg-surface-alt); border-radius: 8px; border: 1px solid var(--border-light);">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Clinical Register</div>
+            <div style="font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin-top: 6px;">
+              Sheet 4: Death
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-muted);">Verified clinical register</div>
+          </div>
+        </div>
+
+        <h4 style="margin-bottom: 12px; font-size: 1rem; color: var(--text-primary);">Recorded Incidents</h4>
+        <div class="table-responsive-wrapper" style="margin-bottom: 20px;">
+          <table class="hospital-table" style="font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Month</th>
+                <th class="num-mono" style="text-align: right;">Count</th>
+                <th>Age</th>
+                <th>Department</th>
+                <th>Circumstance</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${matching.map(m => `
+                <tr>
+                  <td class="num-mono">${m.date}</td>
+                  <td><strong>${m.month}</strong></td>
+                  <td class="num-mono" style="text-align: right; color: var(--danger); font-weight: 700;">${m.count}</td>
+                  <td>${m.age === '0' ? '<span class="kpi-badge badge-warning">0 (Neonate)</span>' : (m.age || '—')}</td>
+                  <td><strong>${m.department}</strong></td>
+                  <td>${m.circumstance}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button class="btn btn-primary" onclick="HospitalApp.switchTab('mortality'); document.getElementById('closeDrilldownModalBtn').click();">
+            <i class="fas fa-arrow-right"></i> Open Full Mortality Register Tab
+          </button>
+        </div>
+      `;
+
+      modal.classList.add('show');
+      return;
+    }
+
+    // 2. Delivery Mode Drilldown
+    if (type === 'delivery') {
+      const isCS = deptName.toLowerCase().includes('caesarean') || deptName.toLowerCase().includes('cs');
+      modalTitle.textContent = isCS ? 'Caesarean Section (CS) — Delivery Breakdown' : 'Spontaneous Vaginal Delivery (SVD) — Breakdown';
+      const list = hospitalData.maternity.monthly;
+      const months = list.map(m => m.month);
+      const dataVals = list.map(m => isCS ? m.cs : m.svd);
+      const totalDeliveries = list.reduce((s, m) => s + m.deliveries, 0);
+      const totalVal = dataVals.reduce((s, v) => s + v, 0);
+      const rate = totalDeliveries > 0 ? ((totalVal / totalDeliveries) * 100).toFixed(1) : 0;
+      const peakIdx = dataVals.indexOf(Math.max(...dataVals));
+
+      modalBody.innerHTML = `
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px;">
+          <div style="padding: 14px; background: var(--bg-surface-alt); border-radius: 8px; border: 1px solid var(--border-light);">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Total ${isCS ? 'C-Sections' : 'SVD Deliveries'}</div>
+            <div style="font-size: 1.8rem; font-weight: 700; font-family: var(--font-mono); color: ${isCS ? '#E84A2D' : '#10B981'}; margin-top: 4px;">
+              ${totalVal.toLocaleString()}
+            </div>
+          </div>
+          <div style="padding: 14px; background: var(--bg-surface-alt); border-radius: 8px; border: 1px solid var(--border-light);">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Delivery Mode Share</div>
+            <div style="font-size: 1.8rem; font-weight: 700; font-family: var(--font-mono); color: var(--primary); margin-top: 4px;">
+              ${rate}%
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">of all ${totalDeliveries.toLocaleString()} facility deliveries</div>
+          </div>
+          <div style="padding: 14px; background: var(--bg-surface-alt); border-radius: 8px; border: 1px solid var(--border-light);">
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Peak Delivery Month</div>
+            <div style="font-size: 1.8rem; font-weight: 700; font-family: var(--font-mono); color: var(--text-primary); margin-top: 4px;">
+              ${months[peakIdx]}
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text-muted);">${Math.max(...dataVals).toLocaleString()} ${isCS ? 'C-Sections' : 'SVDs'}</div>
+          </div>
+        </div>
+
+        <h4 style="margin-bottom: 12px; font-size: 1rem; color: var(--text-primary);">Monthly Progression (Jan - Aug 2026)</h4>
+        <div style="height: 220px; width: 100%; position: relative;">
+          <canvas id="drilldownChartCanvas"></canvas>
+        </div>
+
+        <div style="margin-top: 16px; display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 0.85rem; color: var(--text-muted);">Source: Sheet 3 (BABIES TOTAL)</span>
+          <button class="btn btn-primary" onclick="HospitalApp.switchTab('maternity'); document.getElementById('closeDrilldownModalBtn').click();">
+            <i class="fas fa-arrow-right"></i> Open Full Maternity & Deliveries Tab
+          </button>
+        </div>
+      `;
+
+      modal.classList.add('show');
+
+      setTimeout(() => {
+        const canvas = document.getElementById('drilldownChartCanvas');
+        if (canvas) {
+          new Chart(canvas, {
+            type: 'line',
+            data: {
+              labels: months,
+              datasets: [{
+                label: isCS ? 'Caesarean Section (CS)' : 'Spontaneous Vaginal Delivery (SVD)',
+                data: dataVals,
+                borderColor: isCS ? '#E84A2D' : '#10B981',
+                backgroundColor: isCS ? 'rgba(232, 74, 45, 0.12)' : 'rgba(16, 185, 129, 0.12)',
+                fill: true,
+                tension: 0.35,
+                borderWidth: 3,
+                pointBackgroundColor: isCS ? '#E84A2D' : '#10B981',
+                pointRadius: 5
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: { ticks: { callback: v => v.toLocaleString() } }
+              },
+              plugins: { legend: { display: false } }
+            }
+          });
+        }
+      }, 100);
+      return;
+    }
+
+    // 3. Clinical Inpatient / Outpatient Department Drilldown
     modalTitle.textContent = `${deptName} — Monthly Breakdown`;
 
     const isOPD = type === 'outpatient';
@@ -894,13 +1048,21 @@ const HospitalApp = {
    * Share Snapshot
    */
   shareSnapshot() {
+    const opd = HospitalAnalytics.getOPDTotal();
+    const ipd = HospitalAnalytics.getIPDTotal();
+    const del = HospitalAnalytics.getDeliveriesTotal();
+    const live = HospitalAnalytics.getLiveBirthsTotal();
+    const cs = HospitalAnalytics.getCSStats();
+    const deaths = HospitalAnalytics.getDeathsTotal();
+    const mortRate = HospitalAnalytics.getMortalityRate();
+
     const text = `DMC Hospital Statistics Summary (Jan-Aug 2026):
-• Outpatient Consultations (OPD): 64,105
-• Inpatient Admissions (IPD): 3,120
-• Total Deliveries: 868 (877 Live Births)
-• Caesarean Section Rate: 55.6% (483 CS vs 386 SVD)
-• In-Facility Mortalities: 5 Deaths (0.16% mortality rate)
-Report Source: PATIENTS_STATISTICS JAN TO JULY 2026.xlsx`;
+• Outpatient Consultations (OPD): ${opd.toLocaleString()}
+• Inpatient Admissions (IPD): ${ipd.toLocaleString()}
+• Total Deliveries: ${del.toLocaleString()} (${live.toLocaleString()} Live Births)
+• Caesarean Section Rate: ${cs.rate}% (${cs.cs.toLocaleString()} CS vs ${cs.svd.toLocaleString()} SVD)
+• In-Facility Mortalities: ${deaths} Deaths (${mortRate}% mortality rate)
+Report Source: ${hospitalData.metadata.sourceFile}`;
 
     navigator.clipboard.writeText(text).then(() => {
       ExcelDataParser.showToast("Summary copied to clipboard!", "success");

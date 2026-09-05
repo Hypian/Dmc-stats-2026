@@ -458,6 +458,18 @@
   border-color: rgba(255, 255, 255, 0.08);
 }
 
+#mortalityLegend,
+#deliveryModeLegend {
+  grid-template-columns: 1fr;
+}
+
+#mortalityLegend .legend-label,
+#deliveryModeLegend .legend-label {
+  white-space: normal;
+  text-overflow: clip;
+  word-break: break-word;
+}
+
 /* ==========================================================================
    HIGH-READABILITY MONTHLY DATA TABLE
    ========================================================================== */
