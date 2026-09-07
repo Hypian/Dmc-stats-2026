@@ -62,14 +62,17 @@
         <li>
           <a data-tab="table"><i class="fas fa-table"></i> Monthly Data Table</a>
         </li>
+        <li>
+          <a data-tab="multiyear"><i class="fas fa-chart-line"></i> Multi-Year Trends (2019–2026)</a>
+        </li>
       </ul>
 
       <div class="sidebar-footer">
         <div class="sidebar-status-pill">
           <span class="status-dot-pulse"></span>
-          <span>Excel Data Verified</span>
+          <span id="sidebarStatusText">Excel Data Verified</span>
         </div>
-        <div>Jan – Aug 2026 Records</div>
+        <div id="sidebarPeriodText">2019 – 2026 Records</div>
         <div>Dream Medical Center</div>
       </div>
     </aside>
@@ -86,14 +89,17 @@
           <div class="header-title">
             <h1>Dream Medical Center Hospital — Statistics Dashboard</h1>
             <div class="header-meta">
-              <span><i class="fas fa-calendar-alt"></i> Jan 01 – Aug 31, 2026</span>
+              <span id="headerDateRange"><i class="fas fa-calendar-alt"></i> <span id="headerDateRangeText">Jan 01 – Aug 31, 2026</span></span>
               <span><i class="fas fa-clock"></i> <span id="liveClockText">Live</span></span>
-              <span><i class="fas fa-file-excel"></i> <code>PATIENTS STATISTICS - JAN TO AUG 2026.xlsx</code></span>
+              <span><i class="fas fa-file-excel"></i> <code id="headerSourceFileText">PATIENTS STATISTICS - JAN TO AUG 2026.xlsx</code></span>
             </div>
           </div>
         </div>
 
         <div class="header-right">
+          <button id="openUploadModalBtn" class="btn btn-outline" title="Import Excel Workbook" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8125rem;">
+            <i class="fas fa-file-excel" style="color: #10B981;"></i> <span>Import Excel</span>
+          </button>
           <!-- Dark / Light Theme Toggle -->
           <button id="themeToggleBtn" class="btn btn-outline btn-icon-only" aria-label="Toggle color theme" title="Toggle theme">
             <i class="fas fa-moon"></i>
@@ -106,9 +112,26 @@
 
         <!-- Global Filter Toolbar -->
         <section class="filter-toolbar" aria-label="Dashboard Filters">
-          <div class="filter-group">
+          <!-- Year Selector Group -->
+          <div class="filter-group year-selector-group">
+            <span class="filter-label"><i class="fas fa-calendar-check"></i> Year:</span>
+            <div class="preset-pill-group" id="yearSelectorPills" role="group" aria-label="Dataset Year Selection">
+              <button type="button" class="preset-pill active" data-year="2026">2026</button>
+              <button type="button" class="preset-pill" data-year="2025">2025</button>
+              <button type="button" class="preset-pill" data-year="2024">2024</button>
+              <button type="button" class="preset-pill" data-year="2023">2023</button>
+              <button type="button" class="preset-pill" data-year="2022">2022</button>
+              <button type="button" class="preset-pill" data-year="2021">2021</button>
+              <button type="button" class="preset-pill" data-year="2020">2020</button>
+              <button type="button" class="preset-pill" data-year="2019">2019</button>
+              <button type="button" class="preset-pill" data-year="multi"><i class="fas fa-chart-line"></i> Multi-Year (2019–2026)</button>
+            </div>
+          </div>
+
+          <!-- Period Filter Group -->
+          <div class="filter-group" id="periodFilterGroup">
             <span class="filter-label"><i class="fas fa-filter"></i> Period:</span>
-            <div class="preset-pill-group" role="group" aria-label="Time period selection">
+            <div class="preset-pill-group" id="periodPresetPills" role="group" aria-label="Time period selection">
               <button class="preset-pill active" data-period="all">All Months (Jan–Aug)</button>
               <button class="preset-pill" data-period="q1">Q1 (Jan–Mar)</button>
               <button class="preset-pill" data-period="q2">Q2 (Apr–Jun)</button>
@@ -117,7 +140,8 @@
             </div>
           </div>
 
-          <div class="filter-group">
+          <!-- Single Month Filter Group -->
+          <div class="filter-group" id="monthFilterGroup">
             <span class="filter-label"><i class="fas fa-calendar-day"></i> Single Month:</span>
             <select id="monthFilterSelect" class="select-custom" aria-label="Filter by specific single month">
               <option value="all">All Months (Jan–Aug)</option>
@@ -132,7 +156,8 @@
             </select>
           </div>
 
-          <div class="filter-group">
+          <!-- Department Drilldown Group -->
+          <div class="filter-group" id="deptFilterGroup">
             <span class="filter-label"><i class="fas fa-hospital-user"></i> Department Drilldown:</span>
             <select id="deptFilterSelect" class="select-custom" aria-label="Filter by department">
               <option value="all">All Departments (13 OPD / 9 IPD)</option>
@@ -151,21 +176,21 @@
              ================================================================== -->
         <div id="tab-overview" class="dashboard-tab-panel">
           <!-- Critical Alerts -->
-          <section class="alerts-banner-container" aria-label="Clinical Alerts">
-            <div class="alert-card alert-warning">
+          <section class="alerts-banner-container" id="alertsBannerContainer" aria-label="Clinical Alerts">
+            <div class="alert-card alert-warning" id="alertCardMaternity">
               <div class="alert-content">
                 <i class="fas fa-exclamation-triangle fa-lg"></i>
-                <div>
+                <div id="alertTextMaternity">
                   <strong>Obstetric Delivery Notice:</strong> Caesarean Section rate is <strong>56.1%</strong> (543 CS of 968 deliveries) vs <strong>43.9%</strong> Spontaneous Vaginal Delivery (426 SVD).
                 </div>
               </div>
               <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss alert">&times;</button>
             </div>
 
-            <div class="alert-card alert-info">
+            <div class="alert-card alert-info" id="alertCardSafety">
               <div class="alert-content">
                 <i class="fas fa-circle-info fa-lg"></i>
-                <div>
+                <div id="alertTextSafety">
                   <strong>Facility Inpatient Safety:</strong> <strong>6 in-facility deaths</strong> recorded across 3,120 inpatient admissions (0.19% mortality rate): 4 stillbirths macerated in Maternity, 1 internal medicine, 1 emergency.
                 </div>
               </div>
@@ -267,7 +292,7 @@
               <div class="chart-card-header">
                 <div class="chart-card-title">
                   <h3>Inpatient Admissions by Department (IPD)</h3>
-                  <p>Distribution of 3,120 admissions across 9 departments (Sheet 2)</p>
+                  <p id="inpatientDonutSubtext">Distribution of 3,120 admissions across 9 departments (Sheet 2)</p>
                 </div>
                 <div class="chart-card-actions">
                   <button class="btn-chart-action" onclick="HospitalApp.switchTab('inpatient')">View All Wards</button>
@@ -284,7 +309,7 @@
               <div class="chart-card-header">
                 <div class="chart-card-title">
                   <h3>Outpatient Consultations by Department (OPD)</h3>
-                  <p>Volume distribution of 64,105 patient visits (Sheet 1)</p>
+                  <p id="outpatientDonutSubtext">Volume distribution of 64,105 patient visits (Sheet 1)</p>
                 </div>
                 <div class="chart-card-actions">
                   <button class="btn-chart-action" onclick="HospitalApp.switchTab('outpatient')">View All Services</button>
@@ -301,8 +326,8 @@
           <section class="chart-card">
             <div class="chart-card-header">
               <div class="chart-card-title">
-                <h3>Monthly Patient Inflow Trajectory (Jan – Aug 2026)</h3>
-                <p>Outpatient Consultations (left scale) vs Inpatient Admissions (right scale)</p>
+                <h3 id="trajectoryChartTitle">Monthly Patient Inflow Trajectory (Jan – Aug 2026)</h3>
+                <p id="trajectoryChartSubtext">Outpatient Consultations (left scale) vs Inpatient Admissions (right scale)</p>
               </div>
             </div>
             <div style="height: 310px; width: 100%;">
@@ -318,11 +343,11 @@
           <div class="chart-card">
             <div class="chart-card-header">
               <div class="chart-card-title">
-                <h3>Inpatient Department Volumes & Rankings (Jan–Aug 2026)</h3>
-                <p>Total admissions per specialized ward extracted directly from Sheet: INPATIENT PER DEPARTEMENT</p>
+                <h3 id="ipdRankingTitle">Inpatient Department Volumes & Rankings (Jan–Aug 2026)</h3>
+                <p id="ipdRankingSubtext">Total admissions per specialized ward extracted directly from Sheet: INPATIENT PER DEPARTEMENT</p>
               </div>
               <div class="chart-card-actions">
-                <span class="kpi-badge badge-positive">Total: 3,120 Admissions</span>
+                <span class="kpi-badge badge-positive" id="ipdBadgeRankingTotal">Total: 3,120 Admissions</span>
               </div>
             </div>
             <div style="height: 320px; width: 100%;">
@@ -335,7 +360,7 @@
             <div class="chart-card-header">
               <div class="chart-card-title">
                 <h3>Inpatient Department Monthly Register</h3>
-                <p>Monthly admissions and totals for all 9 wards</p>
+                <p id="ipdTableSubtext">Monthly admissions and totals for all 9 wards</p>
               </div>
             </div>
             <div class="table-responsive-wrapper">
@@ -353,11 +378,11 @@
           <div class="chart-card">
             <div class="chart-card-header">
               <div class="chart-card-title">
-                <h3>Outpatient Department Volume Rankings</h3>
-                <p>Total consultations across all 13 outpatient services (Sheet 1: 64,105 visits)</p>
+                <h3 id="opdRankingTitle">Outpatient Department Volume Rankings</h3>
+                <p id="opdRankingSubtext">Total consultations across all 13 outpatient services (Sheet 1: 64,105 visits)</p>
               </div>
               <div class="chart-card-actions">
-                <span class="kpi-badge badge-positive">Total: 64,105 Visits</span>
+                <span class="kpi-badge badge-positive" id="opdBadgeRankingTotal">Total: 64,105 Visits</span>
               </div>
             </div>
             <div style="height: 340px; width: 100%;">
@@ -390,11 +415,11 @@
             <div class="chart-card">
               <div class="chart-card-header">
                 <div class="chart-card-title">
-                  <h3>Maternity Delivery Mode Ratio (2026)</h3>
+                  <h3 id="maternityDeliveryRatioTitle">Maternity Delivery Mode Ratio (2026)</h3>
                   <p>Caesarean Section (CS) vs Spontaneous Vaginal Delivery (SVD)</p>
                 </div>
                 <div class="chart-card-actions">
-                  <span class="kpi-badge badge-warning">968 Deliveries</span>
+                  <span class="kpi-badge badge-warning" id="maternityDonutBadge">968 Deliveries</span>
                 </div>
               </div>
               <div class="donut-container">
@@ -527,6 +552,158 @@
           </section>
         </div>
 
+        <!-- ==================================================================
+             TAB 7: MULTI-YEAR LONGITUDINAL TRENDS (2019–2026)
+             ================================================================== -->
+        <div id="tab-multiyear" class="dashboard-tab-panel tab-hidden">
+          <!-- Multi-Year Hero KPI Cards Grid -->
+          <section class="kpi-grid" aria-label="Multi-Year Longitudinal Hero KPIs">
+            <div class="kpi-card accent-secondary">
+              <div class="kpi-header">
+                <span class="kpi-title">Cumulative Outpatient (OPD)</span>
+                <div class="kpi-icon-wrap kpi-icon-secondary">
+                  <i class="fas fa-stethoscope"></i>
+                </div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpiMultiOPD">506,735</span>
+                <span class="kpi-unit">visits</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-badge badge-positive">8-Year Growth: +582%</span>
+                <span class="kpi-subtext">2019: 12,540 &rarr; 2025: 101,576</span>
+              </div>
+            </div>
+
+            <div class="kpi-card accent-primary">
+              <div class="kpi-header">
+                <span class="kpi-title">Cumulative Inpatient (IPD)</span>
+                <div class="kpi-icon-wrap kpi-icon-primary">
+                  <i class="fas fa-bed-pulse"></i>
+                </div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpiMultiIPD">21,904</span>
+                <span class="kpi-unit">pts</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-badge badge-positive">8-Year Growth: +656%</span>
+                <span class="kpi-subtext">2019: 569 &rarr; 2025: 4,302</span>
+              </div>
+            </div>
+
+            <div class="kpi-card accent-warning">
+              <div class="kpi-header">
+                <span class="kpi-title">Cumulative Deliveries</span>
+                <div class="kpi-icon-wrap kpi-icon-warning">
+                  <i class="fas fa-baby-carriage"></i>
+                </div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpiMultiDeliveries">7,915</span>
+                <span class="kpi-unit">births</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-badge badge-warning">61.2% Overall CS Rate</span>
+                <span class="kpi-subtext">4,841 CS · 3,075 SVD</span>
+              </div>
+            </div>
+
+            <div class="kpi-card accent-primary">
+              <div class="kpi-header">
+                <span class="kpi-title">Total Patients Served</span>
+                <div class="kpi-icon-wrap kpi-icon-primary">
+                  <i class="fas fa-users-medical"></i>
+                </div>
+              </div>
+              <div class="kpi-value-row">
+                <span class="kpi-value" id="kpiMultiTotalPatients">528,639</span>
+                <span class="kpi-unit">served</span>
+              </div>
+              <div class="kpi-footer">
+                <span class="kpi-badge badge-positive">100% Excel Verified</span>
+                <span class="kpi-subtext">Cumulative Clinical Volume</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Analytics Row 1: Annual Trajectory & Maternity Trends -->
+          <section class="analytics-grid-2col">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <h3>Annual Patient Volume Trajectory (2019 – 2026)</h3>
+                  <p>Outpatient Visits (left axis) vs Inpatient Admissions (right axis)</p>
+                </div>
+              </div>
+              <div style="height: 320px; width: 100%;">
+                <canvas id="multiYearTrajectoryChart"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <h3>Maternity Deliveries & CS vs SVD Trend (2019 – 2026)</h3>
+                  <p>Longitudinal tracking across 7,915 deliveries (Sheet: BABIES TOTAL)</p>
+                </div>
+              </div>
+              <div style="height: 320px; width: 100%;">
+                <canvas id="multiYearDeliveriesChart"></canvas>
+              </div>
+            </div>
+          </section>
+
+          <!-- Analytics Row 2: Top Departments Volume Contribution -->
+          <section class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <h3>Top Department Volume Drivers (8-Year Cumulative OPD)</h3>
+                <p>Volume ranking across all 13 outpatient services (506,735 visits total)</p>
+              </div>
+            </div>
+            <div style="height: 320px; width: 100%;">
+              <canvas id="multiYearDeptRankingChart"></canvas>
+            </div>
+          </section>
+
+          <!-- Multi-Year Outpatient Annual Table -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <h3>Multi-Year Outpatient Annual Register (2019 – 2026)</h3>
+                <p>Annual visits per specialty combining PATIENTS NUMBERS 2019-2024, 2025, and 2026</p>
+              </div>
+              <div class="chart-card-actions">
+                <span class="kpi-badge badge-positive">506,735 Total OPD Visits</span>
+              </div>
+            </div>
+            <div class="table-responsive-wrapper">
+              <table class="hospital-table" id="multiYearOPDTable">
+                <!-- Dynamically populated by app.js -->
+              </table>
+            </div>
+          </div>
+
+          <!-- Multi-Year Inpatient Annual Table -->
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">
+                <h3>Multi-Year Inpatient Annual Register (2019 – 2026)</h3>
+                <p>Annual admissions per ward combining PATIENTS NUMBERS 2019-2024, 2025, and 2026</p>
+              </div>
+              <div class="chart-card-actions">
+                <span class="kpi-badge badge-positive">21,904 Total IPD Admissions</span>
+              </div>
+            </div>
+            <div class="table-responsive-wrapper">
+              <table class="hospital-table" id="multiYearIPDTable">
+                <!-- Dynamically populated by app.js -->
+              </table>
+            </div>
+          </div>
+        </div>
+
       </main>
 
       <!-- App Footer -->
@@ -552,7 +729,11 @@
       </div>
       <div class="modal-body">
         <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 0.9rem;">
-          Upload an updated workbook (e.g. <code>PATIENTS STATISTICS - JAN TO AUG 2026.xlsx</code> or newer additions). The dashboard will parse the sheets and immediately refresh all charts, KPIs, and tables.
+          Upload any updated DMC hospital workbook. Supported files:
+          <code>PATIENTS STATISTICS - JAN TO AUG 2026.xlsx</code>,
+          <code>PATIENTS NUMBERS 2025.xlsx</code>, or
+          <code>PATIENTS NUMBERS 2019-2024.xlsx</code>.
+          The dashboard will auto-detect the file structure, recalculate all clinical statistics, and switch to the relevant view.
         </p>
 
         <div class="dropzone-box" id="excelDropZone" onclick="document.getElementById('excelFileInput').click()">
@@ -568,12 +749,11 @@
         </div>
 
         <div style="margin-top: 20px; font-size: 0.8rem; color: var(--text-muted); background: var(--bg-surface-alt); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
-          <strong><i class="fas fa-check-circle" style="color: #16A085;"></i> Recognized Sheets:</strong>
+          <strong><i class="fas fa-check-circle" style="color: #16A085;"></i> Recognized Workbook Formats:</strong>
           <ul style="margin: 6px 0 0 20px; line-height: 1.6;">
-            <li><code>OUT PATIENT PER DEPARTEMENT</code> (13 departments)</li>
-            <li><code>INPATIENT PER DEPARTEMENT</code> (9 departments)</li>
-            <li><code>BABIES TOTAL</code> (Deliveries, CS vs SVD, historical)</li>
-            <li><code>Death</code> (In-facility deaths, causes)</li>
+            <li><strong>2026 Monthly Workbook</strong>: <code>OUT PATIENT PER DEPARTEMENT</code>, <code>INPATIENT PER DEPARTEMENT</code>, <code>BABIES TOTAL</code>, <code>Death</code></li>
+            <li><strong>2025 12-Month Workbook</strong>: <code>OPD </code> (13 departments), <code>IP</code> (8 wards)</li>
+            <li><strong>2019–2024 Longitudinal Workbook</strong>: <code>OPD</code> (annual 2019–2024), <code>IP</code> (annual 2019–2024)</li>
           </ul>
         </div>
       </div>

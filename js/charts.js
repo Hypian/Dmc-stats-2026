@@ -82,6 +82,9 @@ const HospitalCharts = {
     this.renderDepartmentComparisonBar('ipd');
     this.renderOPDRankingBar();
     this.renderSparklines();
+    this.renderMultiYearTrajectoryChart();
+    this.renderMultiYearDeliveriesChart();
+    this.renderMultiYearDeptRankingChart();
   },
 
   /**
@@ -413,38 +416,90 @@ const HospitalCharts = {
       this.instances.trendLine.destroy();
     }
 
-    const months = hospitalData.metadata.months;
-    const opdMonthly = months.map((_, i) => HospitalAnalytics.getOPDTotal(i));
-    const ipdMonthly = months.map((_, i) => HospitalAnalytics.getIPDTotal(i));
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const isAnnual = hospitalData.metadata && hospitalData.metadata.isAnnualOnly;
+
+    let chartLabels, opdData, ipdData;
+    let pointRadiusOPD = 5, pointRadiusIPD = 5;
+    let hist = null, activeIdx = -1;
+
+    if (isAnnual) {
+      hist = HISTORICAL_MULTI_YEAR;
+      chartLabels = hist.years;
+      opdData = hist.annualTotals.opd;
+      ipdData = hist.annualTotals.ipd;
+      activeIdx = hist.years.findIndex(y => y.startsWith(String(hospitalData.metadata.year)));
+      pointRadiusOPD = hist.years.map((_, i) => i === activeIdx ? 9 : 4);
+      pointRadiusIPD = hist.years.map((_, i) => i === activeIdx ? 9 : 4);
+    } else {
+      chartLabels = hospitalData.metadata.months;
+      opdData = chartLabels.map((_, i) => HospitalAnalytics.getOPDTotal(i));
+      ipdData = chartLabels.map((_, i) => HospitalAnalytics.getIPDTotal(i));
+    }
+
+    const trajTitle = document.getElementById('trajectoryChartTitle');
+    if (trajTitle) {
+      trajTitle.textContent = isAnnual 
+        ? `Longitudinal Patient Trajectory (2019–2026 · Highlighted: ${hospitalData.metadata.year})`
+        : `Monthly Patient Inflow Trajectory (${hospitalData.metadata.periodCovered})`;
+    }
 
     this.instances.trendLine = new Chart(canvas, {
-      type: 'line',
+      type: isAnnual ? 'bar' : 'line',
       data: {
-        labels: months,
-        datasets: [
+        labels: chartLabels,
+        datasets: isAnnual ? [
+          {
+            type: 'bar',
+            label: 'Outpatients (OPD)',
+            data: opdData,
+            backgroundColor: hist.years.map((_, i) => i === activeIdx ? '#E84A2D' : (isDark ? 'rgba(232, 74, 45, 0.35)' : 'rgba(232, 74, 45, 0.4)')),
+            borderColor: hist.years.map((_, i) => i === activeIdx ? '#C0392B' : 'transparent'),
+            borderWidth: hist.years.map((_, i) => i === activeIdx ? 2 : 0),
+            borderRadius: 4,
+            barPercentage: 0.9,
+            categoryPercentage: 0.8,
+            yAxisID: 'yOPD'
+          },
+          {
+            type: 'bar',
+            label: 'Inpatients (IPD)',
+            data: ipdData,
+            backgroundColor: hist.years.map((_, i) => i === activeIdx ? '#2563EB' : (isDark ? 'rgba(37, 99, 235, 0.35)' : 'rgba(37, 99, 235, 0.4)')),
+            borderColor: hist.years.map((_, i) => i === activeIdx ? '#1D4ED8' : 'transparent'),
+            borderWidth: hist.years.map((_, i) => i === activeIdx ? 2 : 0),
+            borderRadius: 4,
+            barPercentage: 0.9,
+            categoryPercentage: 0.8,
+            yAxisID: 'yIPD'
+          }
+        ] : [
           {
             label: 'Outpatients (OPD)',
-            data: opdMonthly,
+            data: opdData,
             borderColor: '#E84A2D',
             backgroundColor: 'rgba(232, 74, 45, 0.08)',
             borderWidth: 3,
             fill: true,
             tension: 0.35,
             pointBackgroundColor: '#E84A2D',
-            pointRadius: 5,
+            pointBorderColor: '#E84A2D',
+            pointBorderWidth: 1,
+            pointRadius: pointRadiusOPD,
             yAxisID: 'yOPD'
           },
           {
             label: 'Inpatients (IPD)',
-            data: ipdMonthly,
+            data: ipdData,
             borderColor: '#2563EB',
             backgroundColor: 'rgba(37, 99, 235, 0.08)',
             borderWidth: 3,
             fill: false,
             tension: 0.35,
             pointBackgroundColor: '#2563EB',
-            pointRadius: 5,
+            pointBorderColor: '#2563EB',
+            pointBorderWidth: 1,
+            pointRadius: pointRadiusIPD,
             yAxisID: 'yIPD'
           }
         ]
@@ -485,7 +540,8 @@ const HospitalCharts = {
             position: 'top',
             labels: {
               color: isDark ? '#FAF6F5' : '#241E1C',
-              usePointStyle: true,
+              usePointStyle: !isAnnual,
+              boxWidth: isAnnual ? 14 : 10,
               font: { family: 'Inter', size: 12, weight: '600' }
             }
           }
@@ -589,7 +645,7 @@ const HospitalCharts = {
       data: {
         labels: labels,
         datasets: [{
-          label: periodFilter ? 'Inpatients (Filtered Period)' : 'Total Inpatients (Jan-Aug 2026)',
+          label: periodFilter ? 'Inpatients (Filtered Period)' : `Total Inpatients (${hospitalData.metadata.periodCovered || hospitalData.metadata.year})`,
           data: dataVals,
           backgroundColor: items.map(d => d.color || '#EC4899'),
           hoverBackgroundColor: items.map(d => d.color || '#DB2777'),
@@ -659,7 +715,7 @@ const HospitalCharts = {
       data: {
         labels: labels,
         datasets: [{
-          label: periodFilter ? 'Outpatients (Filtered Period)' : 'Total Outpatients (Jan-Aug 2026)',
+          label: periodFilter ? 'Outpatients (Filtered Period)' : `Total Outpatients (${hospitalData.metadata.periodCovered || hospitalData.metadata.year})`,
           data: dataVals,
           backgroundColor: items.map(d => d.color || '#2563EB'),
           hoverBackgroundColor: items.map(d => d.color || '#1D4ED8'),
@@ -705,8 +761,14 @@ const HospitalCharts = {
   renderSparklines() {
     this.createSparkline('opdSparkline', hospitalData.metadata.months.map((_, i) => HospitalAnalytics.getOPDTotal(i)), '#E84A2D');
     this.createSparkline('ipdSparkline', hospitalData.metadata.months.map((_, i) => HospitalAnalytics.getIPDTotal(i)), '#2563EB');
-    this.createSparkline('delSparkline', hospitalData.maternity.monthly.map(m => m.deliveries), '#10B981');
-    this.createSparkline('csSparkline', hospitalData.maternity.monthly.map(m => m.cs), '#F97316');
+    const delData = (hospitalData.maternity.monthly && hospitalData.maternity.monthly.length > 0)
+      ? hospitalData.maternity.monthly.map(m => m.deliveries)
+      : [109, 669, 898, 1141, 1252, 1441, 1437, 968];
+    const csData = (hospitalData.maternity.monthly && hospitalData.maternity.monthly.length > 0)
+      ? hospitalData.maternity.monthly.map(m => m.cs)
+      : [99, 457, 547, 738, 779, 854, 824, 543];
+    this.createSparkline('delSparkline', delData, '#10B981');
+    this.createSparkline('csSparkline', csData, '#F97316');
   },
 
   createSparkline(canvasId, dataPoints, strokeColor) {
@@ -796,5 +858,257 @@ const HospitalCharts = {
     this.renderDepartmentComparisonBar('ipd', periodFilter);
     this.renderOPDRankingBar(periodFilter);
     this.renderSparklines();
+    this.renderMultiYearTrajectoryChart();
+    this.renderMultiYearDeliveriesChart();
+    this.renderMultiYearDeptRankingChart();
+  },
+
+  /**
+   * 10. Multi-Year Patient Volume Trajectory Chart (2019 - 2026)
+   */
+  renderMultiYearTrajectoryChart() {
+    const canvas = document.getElementById('multiYearTrajectoryChart');
+    if (!canvas) return;
+
+    if (this.instances.multiYearTrajectory) {
+      this.instances.multiYearTrajectory.destroy();
+    }
+
+    const hist = HISTORICAL_MULTI_YEAR;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+    this.instances.multiYearTrajectory = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: hist.years,
+        datasets: [
+          {
+            type: 'bar',
+            label: 'Outpatients (OPD)',
+            data: hist.annualTotals.opd,
+            backgroundColor: '#E84A2D',
+            hoverBackgroundColor: '#C0392B',
+            borderRadius: 4,
+            barPercentage: 0.9,
+            categoryPercentage: 0.8,
+            yAxisID: 'yOPD'
+          },
+          {
+            type: 'bar',
+            label: 'Inpatients (IPD)',
+            data: hist.annualTotals.ipd,
+            backgroundColor: '#2563EB',
+            hoverBackgroundColor: '#1D4ED8',
+            borderRadius: 4,
+            barPercentage: 0.9,
+            categoryPercentage: 0.8,
+            yAxisID: 'yIPD'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: isDark ? '#B8ABA5' : '#5C504B', font: { weight: '600', family: 'Inter' } }
+          },
+          yOPD: {
+            type: 'linear',
+            position: 'left',
+            grid: { color: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)' },
+            ticks: {
+              color: isDark ? '#FFA392' : '#E84A2D',
+              font: { family: 'JetBrains Mono', weight: '600' },
+              callback: (val) => val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val
+            },
+            title: { display: true, text: 'OPD Visits', color: isDark ? '#FFA392' : '#E84A2D', font: { weight: 'bold' } }
+          },
+          yIPD: {
+            type: 'linear',
+            position: 'right',
+            grid: { drawOnChartArea: false },
+            ticks: {
+              color: isDark ? '#93C5FD' : '#2563EB',
+              font: { family: 'JetBrains Mono', weight: '600' },
+              callback: (val) => val >= 1000 ? `${(val / 1000).toFixed(1)}k` : val
+            },
+            title: { display: true, text: 'IPD Admissions', color: isDark ? '#93C5FD' : '#2563EB', font: { weight: 'bold' } }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              color: isDark ? '#FAF6F5' : '#241E1C',
+              usePointStyle: false,
+              boxWidth: 14,
+              font: { family: 'Inter', size: 12, weight: '600' }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label(context) {
+                return ` ${context.dataset.label}: ${context.raw.toLocaleString()}`;
+              }
+            }
+          }
+        }
+      }
+    });
+  },
+
+  /**
+   * 11. Multi-Year Maternity Deliveries (CS vs SVD) Chart (2019 - 2026)
+   */
+  renderMultiYearDeliveriesChart() {
+    const canvas = document.getElementById('multiYearDeliveriesChart');
+    if (!canvas) return;
+
+    if (this.instances.multiYearDeliveries) {
+      this.instances.multiYearDeliveries.destroy();
+    }
+
+    const hist = HISTORICAL_MULTI_YEAR;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+    this.instances.multiYearDeliveries = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: hist.years,
+        datasets: [
+          {
+            label: 'C-Section (CS)',
+            data: hist.annualTotals.cs,
+            backgroundColor: '#E84A2D',
+            hoverBackgroundColor: '#C0392B',
+            borderRadius: 4
+          },
+          {
+            label: 'Spontaneous Vaginal (SVD)',
+            data: hist.annualTotals.svd,
+            backgroundColor: '#10B981',
+            hoverBackgroundColor: '#059669',
+            borderRadius: 4
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            stacked: true,
+            grid: { display: false },
+            ticks: { color: isDark ? '#B8ABA5' : '#5C504B', font: { weight: '600' } }
+          },
+          y: {
+            stacked: true,
+            grid: { color: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)' },
+            ticks: { color: isDark ? '#B8ABA5' : '#5C504B', font: { family: 'JetBrains Mono' } },
+            title: { display: true, text: 'Total Deliveries', font: { weight: '600' } }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              color: isDark ? '#FAF6F5' : '#241E1C',
+              usePointStyle: true,
+              font: { family: 'Inter', size: 12, weight: '600' }
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label(context) {
+                const yearIdx = context.dataIndex;
+                const total = hist.annualTotals.deliveries[yearIdx];
+                const pct = total > 0 ? ((context.raw / total) * 100).toFixed(1) : '0.0';
+                return ` ${context.dataset.label}: ${context.raw.toLocaleString()} (${pct}%)`;
+              },
+              footer(items) {
+                if (!items.length) return '';
+                const yearIdx = items[0].dataIndex;
+                const total = hist.annualTotals.deliveries[yearIdx];
+                const live = hist.annualTotals.liveBirths[yearIdx];
+                return `Total Deliveries: ${total.toLocaleString()} (${live.toLocaleString()} Live Births)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  },
+
+  /**
+   * 12. Top Department Volume Drivers (8-Year Cumulative OPD)
+   */
+  renderMultiYearDeptRankingChart() {
+    const canvas = document.getElementById('multiYearDeptRankingChart');
+    if (!canvas) return;
+
+    if (this.instances.multiYearDeptRanking) {
+      this.instances.multiYearDeptRanking.destroy();
+    }
+
+    const hist = HISTORICAL_MULTI_YEAR;
+    const sortedDepts = [...hist.opdDepartments].sort((a, b) => b.total - a.total);
+    const labels = sortedDepts.map(d => d.name);
+    const dataVals = sortedDepts.map(d => d.total);
+    const colors = sortedDepts.map(d => d.color);
+    const grandTotal = hist.cumulativeSummary.totalOPD;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+    this.instances.multiYearDeptRanking = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Cumulative OPD Consultations (2019-2026)',
+          data: dataVals,
+          backgroundColor: colors,
+          borderRadius: 6,
+          maxBarThickness: 22
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            grid: { color: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)' },
+            ticks: {
+              color: isDark ? '#B8ABA5' : '#5C504B',
+              font: { family: 'JetBrains Mono' },
+              callback: (val) => val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val
+            }
+          },
+          y: {
+            grid: { display: false },
+            ticks: {
+              color: isDark ? '#FAF6F5' : '#241E1C',
+              font: { family: 'Inter', size: 12, weight: '600' }
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label(context) {
+                const val = context.raw;
+                const pct = grandTotal > 0 ? ((val / grandTotal) * 100).toFixed(1) : '0.0';
+                return ` ${val.toLocaleString()} visits (${pct}% of all 506,735 OPD visits)`;
+              }
+            }
+          }
+        }
+      }
+    });
   }
 };
+
+window.HospitalCharts = HospitalCharts;

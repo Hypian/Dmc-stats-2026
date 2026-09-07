@@ -76,6 +76,43 @@
   border-color: rgba(255, 94, 66, 0.3);
 }
 
+.year-selector-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  background-color: var(--bg-surface-alt);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(232, 74, 45, 0.3);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.year-selector-group .preset-pill {
+  padding: 5px 9px;
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
+}
+
+.year-selector-group .preset-pill.active {
+  background-color: var(--primary);
+  color: #FFFFFF !important;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(232, 74, 45, 0.35);
+  border: 1px solid var(--primary);
+}
+
+[data-theme="dark"] .year-selector-group {
+  border-color: rgba(255, 94, 66, 0.4);
+}
+
+[data-theme="dark"] .year-selector-group .preset-pill.active {
+  background-color: #E84A2D;
+  color: #FFFFFF !important;
+  border-color: #FF5E42;
+  box-shadow: 0 2px 8px rgba(232, 74, 45, 0.5);
+}
+
 .select-custom {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
