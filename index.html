@@ -94,7 +94,7 @@
             <div class="header-meta">
               <span id="headerDateRange"><i class="fas fa-calendar-alt"></i> <span id="headerDateRangeText">Jan 01 – Sep 30, 2026</span></span>
               <span><i class="fas fa-clock"></i> <span id="liveClockText">Live</span></span>
-              <span><i class="fas fa-file-excel"></i> <code id="headerSourceFileText">PATIENTS STATISTICS - JAN TO AUG 2026.xlsx</code></span>
+              <span><i class="fas fa-file-excel"></i> <code id="headerSourceFileText">DMC_Patient_Statistics 2026 YTD.xlsx</code></span>
             </div>
           </div>
         </div>
@@ -591,7 +591,7 @@
                 </div>
               </div>
               <div class="kpi-value-row">
-                <span class="kpi-value" id="kpiMultiOPD">506,735</span>
+                <span class="kpi-value" id="kpiMultiOPD">514,964</span>
                 <span class="kpi-unit">visits</span>
               </div>
               <div class="kpi-footer">
@@ -608,7 +608,7 @@
                 </div>
               </div>
               <div class="kpi-value-row">
-                <span class="kpi-value" id="kpiMultiIPD">21,904</span>
+                <span class="kpi-value" id="kpiMultiIPD">22,279</span>
                 <span class="kpi-unit">pts</span>
               </div>
               <div class="kpi-footer">
@@ -642,7 +642,7 @@
                 </div>
               </div>
               <div class="kpi-value-row">
-                <span class="kpi-value" id="kpiMultiTotalPatients">528,639</span>
+                <span class="kpi-value" id="kpiMultiTotalPatients">537,243</span>
                 <span class="kpi-unit">served</span>
               </div>
               <div class="kpi-footer">
@@ -684,7 +684,7 @@
             <div class="chart-card-header">
               <div class="chart-card-title">
                 <h3>Top Department Volume Drivers (8-Year Cumulative OPD)</h3>
-                <p>Volume ranking across all 13 outpatient services (506,735 visits total)</p>
+                <p>Volume ranking across all 13 outpatient services (514,964 visits total)</p>
               </div>
             </div>
             <div style="height: 320px; width: 100%;">
@@ -700,7 +700,7 @@
                 <p>Annual visits per specialty combining PATIENTS NUMBERS 2019-2024, 2025, and 2026</p>
               </div>
               <div class="chart-card-actions">
-                <span class="kpi-badge badge-positive">506,735 Total OPD Visits</span>
+                <span class="kpi-badge badge-positive" id="multiYearOPDTotalBadge">514,964 Total OPD Visits</span>
               </div>
             </div>
             <div class="table-responsive-wrapper">
@@ -718,7 +718,7 @@
                 <p>Annual admissions per ward combining PATIENTS NUMBERS 2019-2024, 2025, and 2026</p>
               </div>
               <div class="chart-card-actions">
-                <span class="kpi-badge badge-positive">21,904 Total IPD Admissions</span>
+                <span class="kpi-badge badge-positive" id="multiYearIPDTotalBadge">22,279 Total IPD Admissions</span>
               </div>
             </div>
             <div class="table-responsive-wrapper">
@@ -738,7 +738,7 @@
         </div>
         <div class="footer-source">
           <i class="fas fa-database"></i>
-          <span>Source File: <code>PATIENTS STATISTICS - JAN TO AUG 2026.xlsx</code> · Verified Accurate</span>
+          <span>Source File: <code id="footerSourceFileText">DMC_Patient_Statistics 2026 YTD.xlsx</code> · Verified Accurate</span>
         </div>
       </footer>
 
@@ -755,6 +755,7 @@
       <div class="modal-body">
         <p style="margin-bottom: 16px; color: var(--text-secondary); font-size: 0.9rem;">
           Upload any updated DMC hospital workbook. Supported files:
+          <code>DMC_Patient_Statistics 2026 YTD.xlsx</code>,
           <code>PATIENTS STATISTICS - JAN TO AUG 2026.xlsx</code>,
           <code>PATIENTS NUMBERS 2025.xlsx</code>, or
           <code>PATIENTS NUMBERS 2019-2024.xlsx</code>.
@@ -799,11 +800,11 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/insurer-data.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/excel-parser.js"></script>
-  <script src="js/charts.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/insurer-data.js?v=20261004-3"></script>
+  <script src="js/data.js?v=20261004-3"></script>
+  <script src="js/excel-parser.js?v=20261004-3"></script>
+  <script src="js/charts.js?v=20261004-3"></script>
+  <script src="js/app.js?v=20261004-3"></script>
 
 </body>
 </html>

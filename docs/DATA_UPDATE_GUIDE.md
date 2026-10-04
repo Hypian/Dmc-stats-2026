@@ -10,10 +10,11 @@ The dashboard includes a built-in **SheetJS** Excel parser. You can update all s
 
 1. Open the dashboard in your web browser.
 2. Click the **"Import Excel"** button in the top-right header toolbar.
-3. Drag and drop your updated Excel file (e.g., `PATIENTS_STATISTICS JAN TO JULY 2026.xlsx` or any future monthly update) into the upload area.
+3. Drag and drop the applicable Excel file. For the 2026 outpatient and inpatient update, use `DMC_Patient_Statistics 2026 YTD.xlsx`.
 4. The dashboard will instantly:
-   - Read all sheets (`OUT PATIENT PER DEPARTEMENT`, `INPATIENT PER DEPARTEMENT`, `BABIES TOTAL`, `Death`).
-   - Recalculate totals, bed occupancy rates, and C-Section ratios.
+   - Detect month columns and read outpatient and inpatient department counts, including the latest reported month.
+   - Recalculate patient totals, charts, tables, filters, rankings, and multi-year patient comparisons.
+   - Update births and deaths only when the imported workbook contains supported maternity and mortality records.
    - Dynamically re-render all primary donut charts, trend lines, sparklines, and data tables.
    - Show a toast notification confirming the number of parsed departments and deliveries.
 
@@ -42,6 +43,10 @@ When preparing your Excel workbook, ensure the following sheet naming and struct
 - **Row 1**: Headers: `period`, `Death at the HF`, `Age`, `Departement`, `Circonstance`.
 - **Rows 2–8**: In-facility mortality records with date, count, age, department, and cause.
 
+### 2026 YTD patient workbook: `DMC_Patient_Statistics 2026 YTD.xlsx`
+- **`Outpatient`** and **`Inpatient`**: Department rows with Excel date headers for each month. Entered counts are imported; blank future months do not extend the reporting period.
+- **`Babies`** and **`Deaths`**: Patient-only imports do not replace these records. Import their updated figures when they are ready.
+
 ---
 
 ## 3. Direct Code Update (for Pre-bundled Offline Data)
@@ -49,10 +54,10 @@ When preparing your Excel workbook, ensure the following sheet naming and struct
 If you wish to update the default dataset bundled with the dashboard permanently:
 
 1. Open [`js/data.js`](../js/data.js) in your code editor.
-2. Locate the `HOSPITAL_RAW_DATA` object:
+2. Locate the `HOSPITAL_DATASETS['2026']` object:
    - **`outpatient`**: Array of departments with their monthly counts and totals.
    - **`inpatient`**: Array of wards with monthly admissions, assigned beds, and average length of stay (`alos`).
-   - **`maternity.monthly`**: Array of monthly delivery metrics (`deliveries`, `liveBirths`, `cs`, `svd`, `deaths`).
+   - **`maternity.monthly`**: Array of monthly delivery metrics (`deliveries`, `liveBirths`, `cs`, `svd`, `deaths`). Keep these unchanged when entering patient-only updates.
    - **`mortality`**: Array of individual clinical death records.
    - **`bedCapacity.wards`**: Dedicated bed counts per ward.
 3. Save the file. When you reload `index.html`, the new values will be loaded automatically.

@@ -23,6 +23,12 @@ const HospitalApp = {
     this.initTheme();
     this.initClock();
     this.initYearSelector();
+    const initialPeriod = document.getElementById('headerDateRangeText');
+    if (initialPeriod) initialPeriod.textContent = hospitalData.metadata.periodBadge || hospitalData.metadata.periodCovered;
+    const initialSource = document.getElementById('headerSourceFileText');
+    if (initialSource) initialSource.textContent = hospitalData.metadata.sourceFile;
+    const footerSource = document.getElementById('footerSourceFileText');
+    if (footerSource) footerSource.textContent = hospitalData.metadata.sourceFile;
     this.bindEvents();
     ExcelDataParser.init();
     HospitalCharts.initAll();
@@ -116,6 +122,8 @@ const HospitalApp = {
       if (dateRangeEl) dateRangeEl.textContent = '2019 – 2026 Longitudinal Period';
       const sourceFileEl = document.getElementById('headerSourceFileText');
       if (sourceFileEl) sourceFileEl.textContent = 'Combined 2019-2024, 2025 & 2026 Workbooks';
+      const footerSourceEl = document.getElementById('footerSourceFileText');
+      if (footerSourceEl) footerSourceEl.textContent = 'Combined 2019-2024, 2025 & 2026 Workbooks';
       const grandTotalEl = document.getElementById('kpiGrandTotal');
       if (grandTotalEl) grandTotalEl.innerHTML = `<i class="fas fa-users-medical"></i> ${HISTORICAL_MULTI_YEAR.cumulativeSummary.totalPatientsServed.toLocaleString()} Total Patients Served`;
       return;
@@ -136,6 +144,8 @@ const HospitalApp = {
     if (sourceFileEl) {
       sourceFileEl.textContent = hospitalData.metadata.sourceFile;
     }
+    const footerSourceEl = document.getElementById('footerSourceFileText');
+    if (footerSourceEl) footerSourceEl.textContent = hospitalData.metadata.sourceFile;
     const sidebarPeriodEl = document.getElementById('sidebarPeriodText');
     if (sidebarPeriodEl) {
       sidebarPeriodEl.textContent = `${hospitalData.metadata.year} Records`;
@@ -391,6 +401,12 @@ const HospitalApp = {
       if (yearToActivate) {
         this.handleYearChange(yearToActivate);
       } else {
+        const periodEl = document.getElementById('headerDateRangeText');
+        if (periodEl) periodEl.textContent = hospitalData.metadata.periodBadge || hospitalData.metadata.periodCovered;
+        const sourceEl = document.getElementById('headerSourceFileText');
+        if (sourceEl) sourceEl.textContent = hospitalData.metadata.sourceFile;
+        const footerSourceEl = document.getElementById('footerSourceFileText');
+        if (footerSourceEl) footerSourceEl.textContent = hospitalData.metadata.sourceFile;
         this.populateDepartmentFilter();
         this.updateDashboardMetrics();
         HospitalCharts.updateAll(this.currentFilter.periodFilter);
@@ -1218,6 +1234,12 @@ const HospitalApp = {
     const years = hist.patientYears || hist.years;
     const depts = hist.opdDepartments;
     const grandTotal = hist.cumulativeSummary.totalOPD;
+    const multiOpdKpi = document.getElementById('kpiMultiOPD');
+    const multiOpdBadge = document.getElementById('multiYearOPDTotalBadge');
+    if (multiOpdKpi) multiOpdKpi.textContent = grandTotal.toLocaleString();
+    if (multiOpdBadge) multiOpdBadge.textContent = `${grandTotal.toLocaleString()} Total OPD Visits`;
+    const multiPatientsKpi = document.getElementById('kpiMultiTotalPatients');
+    if (multiPatientsKpi) multiPatientsKpi.textContent = hist.cumulativeSummary.totalPatientsServed.toLocaleString();
 
     let html = `
       <thead>
@@ -1281,6 +1303,12 @@ const HospitalApp = {
     const years = hist.patientYears || hist.years;
     const depts = hist.ipdDepartments;
     const grandTotal = hist.cumulativeSummary.totalIPD;
+    const multiIpdKpi = document.getElementById('kpiMultiIPD');
+    const multiIpdBadge = document.getElementById('multiYearIPDTotalBadge');
+    if (multiIpdKpi) multiIpdKpi.textContent = grandTotal.toLocaleString();
+    if (multiIpdBadge) multiIpdBadge.textContent = `${grandTotal.toLocaleString()} Total IPD Admissions`;
+    const multiPatientsKpi = document.getElementById('kpiMultiTotalPatients');
+    if (multiPatientsKpi) multiPatientsKpi.textContent = hist.cumulativeSummary.totalPatientsServed.toLocaleString();
 
     let html = `
       <thead>
