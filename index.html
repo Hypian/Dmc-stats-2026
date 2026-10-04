@@ -54,6 +54,9 @@
           <a data-tab="outpatient"><i class="fas fa-stethoscope"></i> Outpatient (OPD)</a>
         </li>
         <li>
+          <a data-tab="insurers"><i class="fas fa-shield-heart"></i> Insurer Distribution</a>
+        </li>
+        <li>
           <a data-tab="maternity"><i class="fas fa-baby"></i> Maternity & CS Rates</a>
         </li>
         <li>
@@ -89,7 +92,7 @@
           <div class="header-title">
             <h1>Dream Medical Center Hospital — Statistics Dashboard</h1>
             <div class="header-meta">
-              <span id="headerDateRange"><i class="fas fa-calendar-alt"></i> <span id="headerDateRangeText">Jan 01 – Aug 31, 2026</span></span>
+              <span id="headerDateRange"><i class="fas fa-calendar-alt"></i> <span id="headerDateRangeText">Jan 01 – Sep 30, 2026</span></span>
               <span><i class="fas fa-clock"></i> <span id="liveClockText">Live</span></span>
               <span><i class="fas fa-file-excel"></i> <code id="headerSourceFileText">PATIENTS STATISTICS - JAN TO AUG 2026.xlsx</code></span>
             </div>
@@ -132,11 +135,12 @@
           <div class="filter-group" id="periodFilterGroup">
             <span class="filter-label"><i class="fas fa-filter"></i> Period:</span>
             <div class="preset-pill-group" id="periodPresetPills" role="group" aria-label="Time period selection">
-              <button class="preset-pill active" data-period="all">All Months (Jan–Aug)</button>
+              <button class="preset-pill active" data-period="all">All Months (Jan–Sep)</button>
               <button class="preset-pill" data-period="q1">Q1 (Jan–Mar)</button>
               <button class="preset-pill" data-period="q2">Q2 (Apr–Jun)</button>
               <button class="preset-pill" data-period="jul">Jul</button>
               <button class="preset-pill" data-period="aug">Aug</button>
+              <button class="preset-pill" data-period="8">Sep</button>
             </div>
           </div>
 
@@ -144,7 +148,7 @@
           <div class="filter-group" id="monthFilterGroup">
             <span class="filter-label"><i class="fas fa-calendar-day"></i> Single Month:</span>
             <select id="monthFilterSelect" class="select-custom" aria-label="Filter by specific single month">
-              <option value="all">All Months (Jan–Aug)</option>
+              <option value="all">All Months (Jan–Sep)</option>
               <option value="0">January 2026</option>
               <option value="1">February 2026</option>
               <option value="2">March 2026</option>
@@ -153,6 +157,7 @@
               <option value="5">June 2026</option>
               <option value="6">July 2026</option>
               <option value="7">August 2026</option>
+              <option value="8">September 2026</option>
             </select>
           </div>
 
@@ -166,7 +171,7 @@
 
           <div class="filter-group">
             <span class="kpi-badge badge-positive" id="kpiGrandTotal" style="padding: 7px 14px; font-size: 0.85rem;">
-              <i class="fas fa-users-medical"></i> 67,225 Total Patients
+              <i class="fas fa-users-medical"></i> 75,829 Total Patients
             </span>
           </div>
         </section>
@@ -191,7 +196,7 @@
               <div class="alert-content">
                 <i class="fas fa-circle-info fa-lg"></i>
                 <div id="alertTextSafety">
-                  <strong>Facility Inpatient Safety:</strong> <strong>6 in-facility deaths</strong> recorded across 3,120 inpatient admissions (0.19% mortality rate): 4 stillbirths macerated in Maternity, 1 internal medicine, 1 emergency.
+                  <strong>Facility Inpatient Safety (Jan–Aug):</strong> <strong>6 in-facility deaths</strong> recorded across 3,120 Jan–Aug inpatient admissions (0.19% mortality rate): 4 stillbirths macerated in Maternity, 1 internal medicine, 1 emergency.
                 </div>
               </div>
               <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss alert">&times;</button>
@@ -209,7 +214,7 @@
                 </div>
               </div>
               <div class="kpi-value-row">
-                <span class="kpi-value" id="kpiOPDCount">64,105</span>
+                <span class="kpi-value" id="kpiOPDCount">72,334</span>
                 <span class="kpi-unit">visits</span>
               </div>
               <div style="height: 36px; width: 100%; margin: 6px 0;">
@@ -217,7 +222,7 @@
               </div>
               <div class="kpi-footer">
                 <span class="kpi-badge badge-positive">13 Departments</span>
-                <span class="kpi-subtext">Avg: 8,013 / month</span>
+                <span class="kpi-subtext">Avg: 8,037 / month</span>
               </div>
             </div>
 
@@ -230,7 +235,7 @@
                 </div>
               </div>
               <div class="kpi-value-row">
-                <span class="kpi-value" id="kpiIPDCount">3,120</span>
+                <span class="kpi-value" id="kpiIPDCount">3,495</span>
                 <span class="kpi-unit">pts</span>
               </div>
               <div style="height: 36px; width: 100%; margin: 6px 0;">
@@ -238,7 +243,7 @@
               </div>
               <div class="kpi-footer">
                 <span class="kpi-badge badge-positive">9 Specialized Wards</span>
-                <span class="kpi-subtext">Avg: 390 / month</span>
+                <span class="kpi-subtext">Avg: 388 / month</span>
               </div>
             </div>
 
@@ -292,7 +297,7 @@
               <div class="chart-card-header">
                 <div class="chart-card-title">
                   <h3>Inpatient Admissions by Department (IPD)</h3>
-                  <p id="inpatientDonutSubtext">Distribution of 3,120 admissions across 9 departments (Sheet 2)</p>
+                  <p id="inpatientDonutSubtext">Distribution of 3,495 admissions across 9 departments (Sheet 2)</p>
                 </div>
                 <div class="chart-card-actions">
                   <button class="btn-chart-action" onclick="HospitalApp.switchTab('inpatient')">View All Wards</button>
@@ -309,7 +314,7 @@
               <div class="chart-card-header">
                 <div class="chart-card-title">
                   <h3>Outpatient Consultations by Department (OPD)</h3>
-                  <p id="outpatientDonutSubtext">Volume distribution of 64,105 patient visits (Sheet 1)</p>
+                  <p id="outpatientDonutSubtext">Volume distribution of 72,334 patient visits (Sheet 1)</p>
                 </div>
                 <div class="chart-card-actions">
                   <button class="btn-chart-action" onclick="HospitalApp.switchTab('outpatient')">View All Services</button>
@@ -326,7 +331,7 @@
           <section class="chart-card">
             <div class="chart-card-header">
               <div class="chart-card-title">
-                <h3 id="trajectoryChartTitle">Monthly Patient Inflow Trajectory (Jan – Aug 2026)</h3>
+                <h3 id="trajectoryChartTitle">Monthly Patient Inflow Trajectory (Jan – Sep 2026)</h3>
                 <p id="trajectoryChartSubtext">Outpatient Consultations (left scale) vs Inpatient Admissions (right scale)</p>
               </div>
             </div>
@@ -343,11 +348,11 @@
           <div class="chart-card">
             <div class="chart-card-header">
               <div class="chart-card-title">
-                <h3 id="ipdRankingTitle">Inpatient Department Volumes & Rankings (Jan–Aug 2026)</h3>
+                <h3 id="ipdRankingTitle">Inpatient Department Volumes & Rankings (Jan–Sep 2026)</h3>
                 <p id="ipdRankingSubtext">Total admissions per specialized ward extracted directly from Sheet: INPATIENT PER DEPARTEMENT</p>
               </div>
               <div class="chart-card-actions">
-                <span class="kpi-badge badge-positive" id="ipdBadgeRankingTotal">Total: 3,120 Admissions</span>
+                <span class="kpi-badge badge-positive" id="ipdBadgeRankingTotal">Total: 3,495 Admissions</span>
               </div>
             </div>
             <div style="height: 320px; width: 100%;">
@@ -379,10 +384,10 @@
             <div class="chart-card-header">
               <div class="chart-card-title">
                 <h3 id="opdRankingTitle">Outpatient Department Volume Rankings</h3>
-                <p id="opdRankingSubtext">Total consultations across all 13 outpatient services (Sheet 1: 64,105 visits)</p>
+                <p id="opdRankingSubtext">Total consultations across all 13 outpatient services (Sheet 1: 72,334 visits)</p>
               </div>
               <div class="chart-card-actions">
-                <span class="kpi-badge badge-positive" id="opdBadgeRankingTotal">Total: 64,105 Visits</span>
+                <span class="kpi-badge badge-positive" id="opdBadgeRankingTotal">Total: 72,334 Visits</span>
               </div>
             </div>
             <div style="height: 340px; width: 100%;">
@@ -409,6 +414,26 @@
         <!-- ==================================================================
              TAB 4: MATERNITY & DELIVERIES VIEW
              ================================================================== -->
+        <div id="tab-insurers" class="dashboard-tab-panel tab-hidden">
+          <section class="section-heading"><div><h2>Insurer Distribution</h2><p id="insurerPeriodText">November 2018 – September 17, 2026</p></div></section>
+          <section class="kpi-grid insurer-kpis">
+            <article class="kpi-card accent-primary"><span class="kpi-title">Inpatient Admissions</span><strong class="kpi-value" id="insurerIPDTotal">—</strong><span class="kpi-subtext" id="insurerIPDCount">Loading insurers</span></article>
+            <article class="kpi-card accent-secondary"><span class="kpi-title">Outpatient Consultations</span><strong class="kpi-value" id="insurerOPDTotal">—</strong><span class="kpi-subtext" id="insurerOPDCount">Loading insurers</span></article>
+          </section>
+          <section class="analytics-grid-2col">
+            <div class="chart-card"><div class="chart-card-header"><div class="chart-card-title"><h3>Inpatient payer share</h3><p>Top insurers and all remaining insurers</p></div></div><div class="donut-container"><canvas id="insurerIPDDonutChart"></canvas></div><div id="insurerIPDLegend" class="donut-legend-custom"></div></div>
+            <div class="chart-card"><div class="chart-card-header"><div class="chart-card-title"><h3>Outpatient payer share</h3><p>Top insurers and all remaining insurers</p></div></div><div class="donut-container"><canvas id="insurerOPDDonutChart"></canvas></div><div id="insurerOPDLegend" class="donut-legend-custom"></div></div>
+          </section>
+          <section class="analytics-grid-2col">
+            <div class="chart-card"><div class="chart-card-header"><div class="chart-card-title"><h3>Leading inpatient insurers</h3><p>Admissions</p></div></div><div style="height: 320px; width: 100%;"><canvas id="insurerIPDBarChart"></canvas></div></div>
+            <div class="chart-card"><div class="chart-card-header"><div class="chart-card-title"><h3>Leading outpatient insurers</h3><p>Consultations</p></div></div><div style="height: 340px; width: 100%;"><canvas id="insurerOPDBarChart"></canvas></div></div>
+          </section>
+          <section class="analytics-grid-2col insurer-tables">
+            <article class="chart-card table-card"><div class="chart-card-header"><div><h3>Inpatient insurers</h3><p>Admissions by insurer</p></div></div><div class="table-responsive"><table class="hospital-table" id="insurerInpatientTable"></table></div></article>
+            <article class="chart-card table-card"><div class="chart-card-header"><div><h3>Outpatient insurers</h3><p>Consultations by insurer</p></div></div><div class="table-responsive"><table class="hospital-table" id="insurerOutpatientTable"></table></div></article>
+          </section>
+        </div>
+
         <div id="tab-maternity" class="dashboard-tab-panel tab-hidden">
           <section class="analytics-grid-2col">
             <!-- Donut: CS vs SVD -->
@@ -774,6 +799,7 @@
   </div>
 
   <!-- Scripts -->
+  <script src="js/insurer-data.js"></script>
   <script src="js/data.js"></script>
   <script src="js/excel-parser.js"></script>
   <script src="js/charts.js"></script>

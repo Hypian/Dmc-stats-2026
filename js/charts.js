@@ -85,6 +85,25 @@ const HospitalCharts = {
     this.renderMultiYearTrajectoryChart();
     this.renderMultiYearDeliveriesChart();
     this.renderMultiYearDeptRankingChart();
+    this.renderInsurerCharts();
+  },
+
+  renderInsurerCharts() {
+    if (typeof INSURER_DISTRIBUTION === 'undefined' || !INSURER_DISTRIBUTION.inpatient.length) return;
+    const palette = ['#E84A2D', '#3D3532', '#FA8974', '#F59E0B', '#2563EB', '#10B981', '#8B5CF6', '#06B6D4', '#64748B', '#EC4899'];
+    const build = (key, canvasId, type, rows, label) => {
+      const canvas = document.getElementById(canvasId); if (!canvas) return;
+      if (this.instances[key]) this.instances[key].destroy();
+      const top = rows.slice(0, 9), total = rows.reduce((sum, [, value]) => sum + value, 0), topTotal = top.reduce((sum, [, value]) => sum + value, 0);
+      const chartRows = type === 'doughnut' ? [...top, ['OTHER INSURERS', total - topTotal]] : top;
+      const labels = chartRows.map(([name]) => name), values = chartRows.map(([, value]) => value), isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      this.instances[key] = new Chart(canvas, { type, data: { labels, datasets: [{ label, data: values, backgroundColor: chartRows.map((_, index) => palette[index]), borderWidth: type === 'doughnut' ? 2 : 0, borderColor: isDark ? '#1E1A18' : '#FFFFFF', hoverOffset: type === 'doughnut' ? 8 : 0, borderRadius: type === 'bar' ? 6 : 0, maxBarThickness: type === 'bar' ? 24 : undefined }] }, options: { responsive: true, maintainAspectRatio: type === 'doughnut', cutout: type === 'doughnut' ? '66%' : undefined, indexAxis: type === 'bar' ? 'y' : 'x', plugins: { legend: { display: false }, tooltip: { callbacks: { label: context => ` ${context.label}: ${context.raw.toLocaleString()} ${label.toLowerCase()} (${((context.raw / total) * 100).toFixed(1)}%)` } }, donutCenterText: { display: type === 'doughnut', value: total >= 1000 ? `${(total / 1000).toFixed(1)}k` : total.toLocaleString(), subtext: label, valueColor: isDark ? '#FF5E42' : '#E84A2D' } }, scales: type === 'bar' ? { x: { grid: { color: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)' }, ticks: { color: isDark ? '#B8ABA5' : '#5C504B', font: { family: 'JetBrains Mono' }, callback: value => Number(value).toLocaleString() } }, y: { grid: { display: false }, ticks: { color: isDark ? '#FAF6F5' : '#241E1C', font: { family: 'Inter', size: 12, weight: '600' } } } } : {} } });
+      if (type === 'doughnut') this.renderCustomLegend(canvasId === 'insurerIPDDonutChart' ? 'insurerIPDLegend' : 'insurerOPDLegend', labels, values, palette, total, 'insurer');
+    };
+    build('insurerIPDDonut', 'insurerIPDDonutChart', 'doughnut', INSURER_DISTRIBUTION.inpatient, 'Admissions');
+    build('insurerOPDDonut', 'insurerOPDDonutChart', 'doughnut', INSURER_DISTRIBUTION.outpatient, 'Consultations');
+    build('insurerIPDBar', 'insurerIPDBarChart', 'bar', INSURER_DISTRIBUTION.inpatient, 'Admissions');
+    build('insurerOPDBar', 'insurerOPDBarChart', 'bar', INSURER_DISTRIBUTION.outpatient, 'Consultations');
   },
 
   /**
@@ -425,12 +444,12 @@ const HospitalCharts = {
 
     if (isAnnual) {
       hist = HISTORICAL_MULTI_YEAR;
-      chartLabels = hist.years;
+      chartLabels = hist.patientYears || hist.years;
       opdData = hist.annualTotals.opd;
       ipdData = hist.annualTotals.ipd;
-      activeIdx = hist.years.findIndex(y => y.startsWith(String(hospitalData.metadata.year)));
-      pointRadiusOPD = hist.years.map((_, i) => i === activeIdx ? 9 : 4);
-      pointRadiusIPD = hist.years.map((_, i) => i === activeIdx ? 9 : 4);
+      activeIdx = chartLabels.findIndex(y => y.startsWith(String(hospitalData.metadata.year)));
+      pointRadiusOPD = chartLabels.map((_, i) => i === activeIdx ? 9 : 4);
+      pointRadiusIPD = chartLabels.map((_, i) => i === activeIdx ? 9 : 4);
     } else {
       chartLabels = hospitalData.metadata.months;
       opdData = chartLabels.map((_, i) => HospitalAnalytics.getOPDTotal(i));
@@ -835,7 +854,7 @@ const HospitalCharts = {
         </div>
       `;
 
-      item.addEventListener('click', () => {
+      if (type !== 'insurer') item.addEventListener('click', () => {
         if (typeof window.showDepartmentDrilldown === 'function') {
           window.showDepartmentDrilldown(type, label);
         }
@@ -880,7 +899,7 @@ const HospitalCharts = {
     this.instances.multiYearTrajectory = new Chart(canvas, {
       type: 'bar',
       data: {
-        labels: hist.years,
+        labels: hist.patientYears || hist.years,
         datasets: [
           {
             type: 'bar',

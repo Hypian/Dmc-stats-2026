@@ -531,6 +531,18 @@ const ExcelDataParser = {
     HISTORICAL_MULTI_YEAR.annualTotals.opd[7] = opd2026Total;
     HISTORICAL_MULTI_YEAR.annualTotals.ipd[7] = ipd2026Total;
 
+    const metadata = HOSPITAL_DATASETS['2026'].metadata;
+    const months = metadata.months;
+    if (months.length) {
+      const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+      const finalMonthIndex = months.length - 1;
+      const finalDay = new Date(metadata.year, finalMonthIndex + 1, 0).getDate();
+      metadata.periodCovered = `January - ${monthNames[finalMonthIndex]} ${metadata.year}`;
+      metadata.periodBadge = `Jan 01 – ${months[finalMonthIndex]} ${finalDay}, ${metadata.year}`;
+    }
+    metadata.sourceFile = fileName;
+    metadata.lastUpdated = new Date().toISOString().slice(0, 10);
+
     const cum = HISTORICAL_MULTI_YEAR.cumulativeSummary;
     cum.totalOPD = HISTORICAL_MULTI_YEAR.annualTotals.opd.reduce((a, b) => a + b, 0);
     cum.totalIPD = HISTORICAL_MULTI_YEAR.annualTotals.ipd.reduce((a, b) => a + b, 0);
@@ -543,103 +555,134 @@ const ExcelDataParser = {
     return {
       success: true,
       targetYear: '2026',
-      message: `Successfully processed "${fileName}"! Updated ${stats.opdCount} OPD services, ${stats.ipdCount} IPD wards, and ${stats.deliveries} deliveries.`
+      message: stats.deliveries > 0
+        ? `Successfully processed "${fileName}"! Updated ${stats.opdCount} OPD services, ${stats.ipdCount} IPD wards, and ${stats.deliveries} deliveries.`
+        : `Successfully processed "${fileName}"! Updated ${stats.opdCount} OPD services and ${stats.ipdCount} IPD wards. Maternity data was not changed.`
     };
   },
 
-  parse2026Outpatient(rows) {
+  /**
+   * Locate monthly columns in either supported 2026 workbook layout.
+   */
+  detect2026DepartmentLayout(rows) {
+    const monthCols = [];
     let headerRowIndex = -1;
-    for (let r = 0; r < Math.min(rows.length, 6); r++) {
-      const row = rows[r] || [];
-      if (row.some(c => typeof c === 'string' && (c.toUpperCase().includes('DEPART') || c.toUpperCase().includes('OUT PATIENT')))) {
-        headerRowIndex = r;
-        break;
-      }
-    }
-    if (headerRowIndex === -1) headerRowIndex = 2;
 
-    const newOPD = [];
-    const monthCols = [2, 3, 4, 5, 6, 7, 8, 9]; // columns C through J (Jan-Aug)
-
-    for (let r = headerRowIndex + 1; r < rows.length; r++) {
-      const row = rows[r] || [];
-      const rawName = row[0] ? String(row[0]).trim() : '';
-      if (!rawName || rawName.toUpperCase().includes('TOTAL') || rawName.toUpperCase().includes('DEPART')) continue;
-
-      const monthly = monthCols.map(c => Number(row[c]) || 0);
-      const total = monthly.reduce((a, b) => a + b, 0);
-
-      if (total > 0) {
-        const norm = this.normalizeDeptName(rawName);
-        newOPD.push({
-          id: rawName.toLowerCase().replace(/[^a-z0-9]/g, '_'),
-          name: rawName.toUpperCase(),
-          monthly: monthly,
-          total: total,
-          color: this.getColorForDept(norm)
-        });
-
-        // Sync to multi-year 2026 (index 7)
-        const myEntry = HISTORICAL_MULTI_YEAR.opdDepartments.find(d => this.normalizeDeptName(d.name) === norm);
-        if (myEntry) {
-          myEntry.years[7] = total;
-          myEntry.total = myEntry.years.reduce((a, b) => a + b, 0);
+    rows.forEach((row, rowIndex) => {
+      const detected = [];
+      (row || []).forEach((cell, colIndex) => {
+        if (cell instanceof Date && !Number.isNaN(cell.getTime())) {
+          detected.push({ colIndex, monthIndex: cell.getMonth() });
+          return;
         }
+
+        const value = String(cell || '').trim().toUpperCase();
+        const dateMatch = value.match(/^20\d{2}[-/](0?[1-9]|1[0-2])(?:[-/]\d{1,2})?$/);
+        const monthFirstDateMatch = value.match(/^(0?[1-9]|1[0-2])[-/]\d{1,2}[-/]20\d{2}$/);
+        const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+        const monthIndex = monthNames.findIndex(month => value === month || value.startsWith(`${month} `));
+
+        if (dateMatch || monthFirstDateMatch) {
+          detected.push({ colIndex, monthIndex: Number(dateMatch ? dateMatch[1] : monthFirstDateMatch[1]) - 1 });
+        } else if (monthIndex !== -1) {
+          detected.push({ colIndex, monthIndex });
+        }
+      });
+
+      if (detected.length >= 6 && (headerRowIndex === -1 || detected.length > monthCols.length)) {
+        headerRowIndex = rowIndex;
+        monthCols.splice(0, monthCols.length, ...detected);
+      }
+    });
+
+    if (headerRowIndex === -1) {
+      return {
+        headerRowIndex: 2,
+        monthCols: [2, 3, 4, 5, 6, 7, 8, 9].map((colIndex, monthIndex) => ({ colIndex, monthIndex }))
+      };
+    }
+
+    return { headerRowIndex, monthCols };
+  },
+
+  parse2026DepartmentRows(rows, kind) {
+    const layout = this.detect2026DepartmentLayout(rows);
+    const departments = [];
+    let lastMonthIndex = -1;
+
+    for (let rowIndex = layout.headerRowIndex + 1; rowIndex < rows.length; rowIndex++) {
+      const row = rows[rowIndex] || [];
+      const rawName = row[0] ? String(row[0]).trim() : '';
+      if (!rawName || /TOTAL|DEPART|WARD|INPATIENT/i.test(rawName)) continue;
+
+      const monthly = new Array(12).fill(null);
+      layout.monthCols.forEach(({ colIndex, monthIndex }) => {
+        const rawValue = row[colIndex];
+        if (rawValue !== null && rawValue !== undefined && rawValue !== '') {
+          const value = Number(rawValue);
+          if (Number.isFinite(value)) {
+            monthly[monthIndex] = value;
+            lastMonthIndex = Math.max(lastMonthIndex, monthIndex);
+          }
+        }
+      });
+
+      if (monthly.some(value => value !== null && value !== 0)) {
+        departments.push({ rawName, monthly });
       }
     }
 
-    if (newOPD.length > 0) {
-      HOSPITAL_DATASETS['2026'].outpatient = newOPD;
-    }
-    return newOPD.length;
+    if (lastMonthIndex < 0) return { departments: [], monthCount: 0 };
+
+    const normalized = departments.map(({ rawName, monthly }) => {
+      const values = monthly.slice(0, lastMonthIndex + 1).map(value => value ?? 0);
+      const norm = this.normalizeDeptName(rawName);
+      return {
+        id: rawName.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+        name: rawName.toUpperCase(),
+        monthly: values,
+        total: values.reduce((sum, value) => sum + value, 0),
+        color: this.getColorForDept(norm),
+        normalizedName: norm
+      };
+    });
+
+    return { departments: normalized, monthCount: lastMonthIndex + 1 };
+  },
+
+  parse2026Outpatient(rows) {
+    const parsed = this.parse2026DepartmentRows(rows, 'outpatient');
+    parsed.departments.forEach(dept => {
+      const historical = HISTORICAL_MULTI_YEAR.opdDepartments.find(item => this.normalizeDeptName(item.name) === dept.normalizedName);
+      if (historical) {
+        historical.years[7] = dept.total;
+        historical.total = historical.years.reduce((sum, value) => sum + value, 0);
+      }
+      delete dept.normalizedName;
+    });
+
+    if (parsed.departments.length) HOSPITAL_DATASETS['2026'].outpatient = parsed.departments;
+    HOSPITAL_DATASETS['2026'].metadata.months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].slice(0, parsed.monthCount);
+    return parsed.departments.length;
   },
 
   parse2026Inpatient(rows) {
-    let headerRowIndex = -1;
-    for (let r = 0; r < Math.min(rows.length, 6); r++) {
-      const row = rows[r] || [];
-      if (row.some(c => typeof c === 'string' && c.toUpperCase().includes('INPATIENT'))) {
-        headerRowIndex = r;
-        break;
+    const parsed = this.parse2026DepartmentRows(rows, 'inpatient');
+    parsed.departments.forEach(dept => {
+      const historical = HISTORICAL_MULTI_YEAR.ipdDepartments.find(item => this.normalizeDeptName(item.name) === dept.normalizedName);
+      if (historical) {
+        historical.years[7] = dept.total;
+        historical.total = historical.years.reduce((sum, value) => sum + value, 0);
       }
+      delete dept.normalizedName;
+    });
+
+    if (parsed.departments.length) HOSPITAL_DATASETS['2026'].inpatient = parsed.departments;
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    if (parsed.monthCount > HOSPITAL_DATASETS['2026'].metadata.months.length) {
+      HOSPITAL_DATASETS['2026'].metadata.months = monthNames.slice(0, parsed.monthCount);
     }
-    if (headerRowIndex === -1) headerRowIndex = 1;
-
-    const newIPD = [];
-    const monthCols = [2, 3, 4, 5, 6, 7, 8, 9]; // Columns C through J (Jan-Aug)
-
-    for (let r = headerRowIndex + 1; r < rows.length; r++) {
-      const row = rows[r] || [];
-      const rawName = row[0] ? String(row[0]).trim() : '';
-      if (!rawName || rawName.toUpperCase().includes('TOTAL') || rawName.toUpperCase().includes('INPATIENT')) continue;
-
-      // Ensure August (col 9) is included without the Excel row formula bug!
-      const monthly = monthCols.map(c => Number(row[c]) || 0);
-      const total = monthly.reduce((a, b) => a + b, 0);
-
-      if (total > 0) {
-        const norm = this.normalizeDeptName(rawName);
-        newIPD.push({
-          id: rawName.toLowerCase().replace(/[^a-z0-9]/g, '_'),
-          name: rawName.toUpperCase(),
-          monthly: monthly,
-          total: total,
-          color: this.getColorForDept(norm)
-        });
-
-        // Sync to multi-year 2026 (index 7)
-        const myEntry = HISTORICAL_MULTI_YEAR.ipdDepartments.find(d => this.normalizeDeptName(d.name) === norm);
-        if (myEntry) {
-          myEntry.years[7] = total;
-          myEntry.total = myEntry.years.reduce((a, b) => a + b, 0);
-        }
-      }
-    }
-
-    if (newIPD.length > 0) {
-      HOSPITAL_DATASETS['2026'].inpatient = newIPD;
-    }
-    return newIPD.length;
+    return parsed.departments.length;
   },
 
   parse2026Babies(rows) {

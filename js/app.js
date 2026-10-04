@@ -29,6 +29,7 @@ const HospitalApp = {
     this.updateDashboardMetrics();
     this.populateDepartmentFilter();
     this.renderAllTables();
+    window.addEventListener('insurerDataLoaded', () => this.renderInsurerTables());
   },
 
   /**
@@ -116,7 +117,7 @@ const HospitalApp = {
       const sourceFileEl = document.getElementById('headerSourceFileText');
       if (sourceFileEl) sourceFileEl.textContent = 'Combined 2019-2024, 2025 & 2026 Workbooks';
       const grandTotalEl = document.getElementById('kpiGrandTotal');
-      if (grandTotalEl) grandTotalEl.innerHTML = `<i class="fas fa-users-medical"></i> 528,639 Total Patients Served`;
+      if (grandTotalEl) grandTotalEl.innerHTML = `<i class="fas fa-users-medical"></i> ${HISTORICAL_MULTI_YEAR.cumulativeSummary.totalPatientsServed.toLocaleString()} Total Patients Served`;
       return;
     }
 
@@ -157,11 +158,12 @@ const HospitalApp = {
         `;
       } else {
         periodPillsContainer.innerHTML = `
-          <button class="preset-pill active" data-period="all">All Months (Jan–Aug)</button>
+          <button class="preset-pill active" data-period="all">All Months (Jan–Sep)</button>
           <button class="preset-pill" data-period="q1">Q1 (Jan–Mar)</button>
           <button class="preset-pill" data-period="q2">Q2 (Apr–Jun)</button>
           <button class="preset-pill" data-period="jul">Jul</button>
           <button class="preset-pill" data-period="aug">Aug</button>
+          <button class="preset-pill" data-period="8">Sep</button>
         `;
       }
       this.bindPeriodButtons();
@@ -173,7 +175,10 @@ const HospitalApp = {
       if (hospitalData.metadata.isAnnualOnly) {
         monthSelect.innerHTML = `<option value="all">Full Year ${yearKey} (Annual Total)</option>`;
       } else {
-        let optHtml = `<option value="all">All Months (${hospitalData.metadata.months.length === 12 ? 'Jan–Dec' : 'Jan–Aug'})</option>`;
+        const firstMonth = hospitalData.metadata.months[0];
+        const lastMonth = hospitalData.metadata.months[hospitalData.metadata.months.length - 1];
+        const monthRange = hospitalData.metadata.months.length === 12 ? 'Jan–Dec' : `${firstMonth}–${lastMonth}`;
+        let optHtml = `<option value="all">All Months (${monthRange})</option>`;
         hospitalData.metadata.months.forEach((m, idx) => {
           optHtml += `<option value="${idx}">${m} ${hospitalData.metadata.year}</option>`;
         });
@@ -195,7 +200,11 @@ const HospitalApp = {
     const alertSafety = document.getElementById('alertTextSafety');
     if (alertSafety) {
       if (yearKey === '2026') {
-        alertSafety.innerHTML = `<strong>Facility Inpatient Safety:</strong> <strong>6 in-facility deaths</strong> recorded across 3,120 inpatient admissions (0.19% mortality rate): 4 stillbirths macerated in Maternity, 1 internal medicine, 1 emergency.`;
+        const reportedMonths = hospitalData.metadata.months.slice(0, 8).map((_, index) => index);
+        const deaths = HospitalAnalytics.getDeathsTotal(reportedMonths);
+        const admissions = HospitalAnalytics.getIPDTotal(reportedMonths);
+        const mortalityRate = admissions > 0 ? ((deaths / admissions) * 100).toFixed(2) : '0.00';
+        alertSafety.innerHTML = `<strong>Facility Inpatient Safety (Jan–Aug):</strong> <strong>${deaths} in-facility deaths</strong> recorded across ${admissions.toLocaleString()} Jan–Aug inpatient admissions (${mortalityRate}% mortality rate): 4 stillbirths macerated in Maternity, 1 internal medicine, 1 emergency.`;
       } else {
         alertSafety.innerHTML = `<strong>Annual Clinical Inflow (${hospitalData.metadata.year}):</strong> <strong>${opdTot.toLocaleString()} Outpatient consultations</strong> and <strong>${ipdTot.toLocaleString()} Inpatient admissions</strong> recorded across all departments (${hospitalData.metadata.sourceFile}).`;
       }
@@ -455,7 +464,7 @@ const HospitalApp = {
   },
 
   /**
-   * Handle Period Filter (All, Q1, Q2, Q3, Q4, Jul, Aug, or individual month index)
+  * Handle Period Filter (All, quarterly, Jul, Aug, Sep, or individual month index)
    */
   handlePeriodChange(period) {
     this.currentFilter.period = String(period);
@@ -622,6 +631,24 @@ const HospitalApp = {
     this.renderMasterTable();
     this.renderMultiYearOPDTable();
     this.renderMultiYearIPDTable();
+    this.renderInsurerTables();
+  },
+
+  renderInsurerTables() {
+    if (typeof INSURER_DISTRIBUTION === 'undefined') return;
+    const render = (tableId, rows, label) => {
+      const table = document.getElementById(tableId); if (!table) return 0;
+      const total = rows.reduce((sum, [, value]) => sum + value, 0);
+      table.innerHTML = `<thead><tr><th>INSURER</th><th class="num-mono">${label}</th><th class="num-mono">SHARE</th></tr></thead><tbody>${rows.map(([name, value]) => `<tr><td>${name}</td><td class="num-mono">${value.toLocaleString()}</td><td class="num-mono">${total ? ((value / total) * 100).toFixed(1) : '0.0'}%</td></tr>`).join('')}</tbody>`;
+      return total;
+    };
+    const ipdTotal = render('insurerInpatientTable', INSURER_DISTRIBUTION.inpatient, 'ADMISSIONS');
+    const opdTotal = render('insurerOutpatientTable', INSURER_DISTRIBUTION.outpatient, 'CONSULTATIONS');
+    const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+    setText('insurerIPDTotal', ipdTotal.toLocaleString()); setText('insurerOPDTotal', opdTotal.toLocaleString());
+    setText('insurerIPDCount', `${INSURER_DISTRIBUTION.inpatient.length} insurer records`); setText('insurerOPDCount', `${INSURER_DISTRIBUTION.outpatient.length} insurer records`);
+    setText('insurerPeriodText', INSURER_DISTRIBUTION.metadata.periodCovered);
+    if (typeof HospitalCharts !== 'undefined') HospitalCharts.renderInsurerCharts();
   },
 
   /**
@@ -1188,7 +1215,7 @@ const HospitalApp = {
     if (!table) return;
 
     const hist = HISTORICAL_MULTI_YEAR;
-    const years = hist.years;
+    const years = hist.patientYears || hist.years;
     const depts = hist.opdDepartments;
     const grandTotal = hist.cumulativeSummary.totalOPD;
 
@@ -1251,7 +1278,7 @@ const HospitalApp = {
     if (!table) return;
 
     const hist = HISTORICAL_MULTI_YEAR;
-    const years = hist.years;
+    const years = hist.patientYears || hist.years;
     const depts = hist.ipdDepartments;
     const grandTotal = hist.cumulativeSummary.totalIPD;
 
