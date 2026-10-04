@@ -100,7 +100,8 @@
         </div>
 
         <div class="header-right">
-          <button id="openUploadModalBtn" class="btn btn-outline" title="Import Excel Workbook" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8125rem;">
+          <!-- Excel Upload Button (Hidden for future release) -->
+          <button id="openUploadModalBtn" class="btn btn-outline" title="Import Excel Workbook" style="display: none; align-items: center; gap: 6px; font-size: 0.8125rem;">
             <i class="fas fa-file-excel" style="color: #10B981;"></i> <span>Import Excel</span>
           </button>
           <!-- Dark / Light Theme Toggle -->
@@ -555,8 +556,12 @@
                   <button id="tabTableOPD" class="preset-pill active">Outpatient (13 Depts)</button>
                   <button id="tabTableIPD" class="preset-pill">Inpatient (9 Depts)</button>
                 </div>
-                <button class="btn btn-outline" onclick="window.print()" title="Print table">
+                <!-- Actions (Hidden for future release) -->
+                <button id="printTableBtn" class="btn btn-outline" onclick="window.print()" title="Print table" style="display: none;">
                   <i class="fas fa-print"></i> Print
+                </button>
+                <button id="exportExcelBtn" class="btn btn-outline" title="Export to Excel" style="display: none;">
+                  <i class="fas fa-file-excel" style="color: #10B981;"></i> Export Excel
                 </button>
               </div>
             </div>
