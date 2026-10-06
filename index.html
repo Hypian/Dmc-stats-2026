@@ -141,7 +141,7 @@
               <button class="preset-pill" data-period="q2">Q2 (Apr–Jun)</button>
               <button class="preset-pill" data-period="jul">Jul</button>
               <button class="preset-pill" data-period="aug">Aug</button>
-              <button class="preset-pill" data-period="8">Sep</button>
+              <button class="preset-pill" data-period="sep">Sep</button>
             </div>
           </div>
 
@@ -187,7 +187,7 @@
               <div class="alert-content">
                 <i class="fas fa-exclamation-triangle fa-lg"></i>
                 <div id="alertTextMaternity">
-                  <strong>Obstetric Delivery Notice:</strong> Caesarean Section rate is <strong>56.1%</strong> (543 CS of 968 deliveries) vs <strong>43.9%</strong> Spontaneous Vaginal Delivery (426 SVD).
+                  <strong>Obstetric Delivery Notice:</strong> Caesarean Section rate is <strong>55.9%</strong> (623 CS of 1,115 deliveries) vs <strong>44.1%</strong> Spontaneous Vaginal Delivery (492 SVD).
                 </div>
               </div>
               <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss alert">&times;</button>
@@ -197,7 +197,7 @@
               <div class="alert-content">
                 <i class="fas fa-circle-info fa-lg"></i>
                 <div id="alertTextSafety">
-                  <strong>Facility Inpatient Safety (Jan–Aug):</strong> <strong>6 in-facility deaths</strong> recorded across 3,120 Jan–Aug inpatient admissions (0.19% mortality rate): 4 stillbirths macerated in Maternity, 1 internal medicine, 1 emergency.
+                  <strong>Facility Inpatient Safety (Jan–Sep):</strong> <strong>7 in-facility deaths</strong> recorded across 3,495 Jan–Sep inpatient admissions (0.20% mortality rate): 5 stillbirths macerated in Maternity, 1 internal medicine, 1 emergency.
                 </div>
               </div>
               <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss alert">&times;</button>
@@ -257,15 +257,15 @@
                 </div>
               </div>
               <div class="kpi-value-row">
-                <span class="kpi-value" id="kpiDeliveriesCount">968</span>
+                <span class="kpi-value" id="kpiDeliveriesCount">1,115</span>
                 <span class="kpi-unit">births</span>
               </div>
               <div style="height: 36px; width: 100%; margin: 6px 0;">
                 <canvas id="delSparkline"></canvas>
               </div>
               <div class="kpi-footer">
-                <span class="kpi-badge badge-positive"><span id="kpiLiveBirthsSub">977 Live Births</span></span>
-                <span class="kpi-subtext">Jan – Aug 2026</span>
+                <span class="kpi-badge badge-positive"><span id="kpiLiveBirthsSub">1,126 Live Births</span></span>
+                <span class="kpi-subtext">Jan – Sep 2026</span>
               </div>
             </div>
 
@@ -278,14 +278,14 @@
                 </div>
               </div>
               <div class="kpi-value-row">
-                <span class="kpi-value" id="kpiCSRate">56.1%</span>
+                <span class="kpi-value" id="kpiCSRate">55.9%</span>
                 <span class="kpi-unit">ratio</span>
               </div>
               <div style="height: 36px; width: 100%; margin: 6px 0;">
                 <canvas id="csSparkline"></canvas>
               </div>
               <div class="kpi-footer">
-                <span class="kpi-badge badge-warning"><span id="kpiCSRatioSub">543 CS · 426 SVD</span></span>
+                <span class="kpi-badge badge-warning"><span id="kpiCSRatioSub">623 CS · 492 SVD</span></span>
                 <span class="kpi-subtext">Obstetric Service</span>
               </div>
             </div>
@@ -445,7 +445,7 @@
                   <p>Caesarean Section (CS) vs Spontaneous Vaginal Delivery (SVD)</p>
                 </div>
                 <div class="chart-card-actions">
-                  <span class="kpi-badge badge-warning" id="maternityDonutBadge">968 Deliveries</span>
+                  <span class="kpi-badge badge-warning" id="maternityDonutBadge">1,115 Deliveries</span>
                 </div>
               </div>
               <div class="donut-container">
@@ -459,10 +459,10 @@
               <div class="chart-card-header">
                 <div class="chart-card-title">
                   <h3>Multi-Year Historical Deliveries (2019 – 2026)</h3>
-                  <p>8-Year longitudinal evolution (Sheet 3: 7,915 deliveries total)</p>
+                  <p>8-Year longitudinal evolution (Sheet: Births by Year: 8,062 deliveries total)</p>
                 </div>
                 <div class="chart-card-actions">
-                  <span class="kpi-badge badge-positive">7,915 Total</span>
+                  <span class="kpi-badge badge-positive">8,062 Total</span>
                 </div>
               </div>
               <div style="height: 310px; width: 100%;">
@@ -475,8 +475,8 @@
           <div class="chart-card">
             <div class="chart-card-header">
               <div class="chart-card-title">
-                <h3>Maternity Monthly Performance Register (Jan – Aug 2026)</h3>
-                <p>Deliveries, Live Births, Caesarean Sections, and SVD from Sheet: BABIES TOTAL</p>
+                <h3>Maternity Monthly Performance Register (Jan – Sep 2026)</h3>
+                <p>Deliveries, Live Births, Caesarean Sections, and SVD from Sheet: Babies</p>
               </div>
             </div>
             <div class="table-responsive-wrapper">
@@ -491,7 +491,7 @@
             <div class="chart-card-header">
               <div class="chart-card-title">
                 <h3>Multi-Year Historical Deliveries Register (2019 – 2026)</h3>
-                <p>8-Year longitudinal tracking from Sheet: BABIES TOTAL (7,915 cumulative deliveries)</p>
+                <p>8-Year longitudinal tracking from Sheet: Births by Year (8,062 cumulative deliveries)</p>
               </div>
             </div>
             <div class="table-responsive-wrapper">
@@ -515,7 +515,7 @@
                   <p>Detailed deaths recorded in health facility register (Sheet 4)</p>
                 </div>
                 <div class="chart-card-actions">
-                  <span id="mortalityRatePillBadge" class="kpi-badge badge-positive">0.19% Mortality</span>
+                  <span id="mortalityRatePillBadge" class="kpi-badge badge-positive">0.20% Mortality</span>
                 </div>
               </div>
               <div class="donut-container">
@@ -529,7 +529,7 @@
               <div class="chart-card-header">
                 <div class="chart-card-title">
                   <h3>Documented Clinical Mortality Log</h3>
-                  <p>Exact records from Sheet: Death (6 facility mortalities recorded Jan–Aug 2026)</p>
+                  <p>Exact records from Sheet: Deaths (7 facility mortalities recorded Jan–Sep 2026)</p>
                 </div>
               </div>
               <div class="table-responsive-wrapper">
@@ -782,7 +782,8 @@
         <div style="margin-top: 20px; font-size: 0.8rem; color: var(--text-muted); background: var(--bg-surface-alt); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
           <strong><i class="fas fa-check-circle" style="color: #16A085;"></i> Recognized Workbook Formats:</strong>
           <ul style="margin: 6px 0 0 20px; line-height: 1.6;">
-            <li><strong>2026 Monthly Workbook</strong>: <code>OUT PATIENT PER DEPARTEMENT</code>, <code>INPATIENT PER DEPARTEMENT</code>, <code>BABIES TOTAL</code>, <code>Death</code></li>
+            <li><strong>2026 YTD Workbook (New Format)</strong>: <code>Outpatient</code>, <code>Inpatient</code>, <code>Babies</code>, <code>Deaths</code></li>
+            <li><strong>2026 Monthly Workbook (Legacy)</strong>: <code>OUT PATIENT PER DEPARTEMENT</code>, <code>INPATIENT PER DEPARTEMENT</code>, <code>BABIES TOTAL</code>, <code>Death</code></li>
             <li><strong>2025 12-Month Workbook</strong>: <code>OPD </code> (13 departments), <code>IP</code> (8 wards)</li>
             <li><strong>2019–2024 Longitudinal Workbook</strong>: <code>OPD</code> (annual 2019–2024), <code>IP</code> (annual 2019–2024)</li>
           </ul>
@@ -805,11 +806,11 @@
   </div>
 
   <!-- Scripts -->
-  <script src="js/insurer-data.js?v=20261004-3"></script>
-  <script src="js/data.js?v=20261004-3"></script>
-  <script src="js/excel-parser.js?v=20261004-3"></script>
-  <script src="js/charts.js?v=20261004-3"></script>
-  <script src="js/app.js?v=20261004-3"></script>
+  <script src="js/insurer-data.js?v=20261006-1"></script>
+  <script src="js/data.js?v=20261006-1"></script>
+  <script src="js/excel-parser.js?v=20261006-1"></script>
+  <script src="js/charts.js?v=20261006-1"></script>
+  <script src="js/app.js?v=20261006-1"></script>
 
 </body>
 </html>

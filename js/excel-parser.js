@@ -225,11 +225,11 @@ const ExcelDataParser = {
       }
     }
 
-    // Default fallback: 8 months (cols C through J, index 2-9)
-    return [2, 3, 4, 5, 6, 7, 8, 9].map((colIdx, i) => ({
+    // Default fallback: 9 months (cols C through K, index 2-10)
+    return [2, 3, 4, 5, 6, 7, 8, 9, 10].map((colIdx, i) => ({
       colIndex: colIdx,
       monthIndex: i,
-      label: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'][i]
+      label: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'][i]
     }));
   },
 
@@ -689,7 +689,26 @@ const ExcelDataParser = {
     const monthlyData = [];
     let totalDeliveries = 0;
 
-    for (let r = 1; r < Math.min(rows.length, 14); r++) {
+    // Detect header row where col 0 is Month/Period/Date and col 1 is Deliveries/Health Facility
+    let headerRowIdx = -1;
+    for (let r = 0; r < Math.min(rows.length, 12); r++) {
+      const row = rows[r] || [];
+      const c0 = String(row[0] || '').trim().toUpperCase();
+      const c1 = String(row[1] || '').trim().toUpperCase();
+      if ((c0.includes('MONTH') || c0.includes('PERIOD') || c0.includes('DATE')) && 
+          (c1.includes('DELIVER') || c1.includes('HEALTH') || c1.includes('FACILITY'))) {
+        headerRowIdx = r;
+        break;
+      }
+    }
+
+    if (headerRowIdx === -1) {
+      headerRowIdx = 0;
+    }
+
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    for (let r = headerRowIdx + 1; r < rows.length; r++) {
       const row = rows[r] || [];
       if (!row[0] || String(row[0]).toUpperCase().includes('TOTAL')) break;
 
@@ -700,22 +719,26 @@ const ExcelDataParser = {
       const svd = Number(row[6]) || 0;
 
       if (del > 0 || live > 0) {
-        let monthName = "M" + r;
-        if (row[0] instanceof Date) {
-          monthName = row[0].toLocaleString('default', { month: 'short' });
+        let monthName = "M" + (monthlyData.length + 1);
+        if (row[0] instanceof Date && !isNaN(row[0].getTime())) {
+          monthName = monthNames[row[0].getMonth()] || row[0].toLocaleString('en-US', { month: 'short' });
         } else if (typeof row[0] === 'string' && row[0].includes('-')) {
           const parts = row[0].split('-');
           const mIdx = parseInt(parts[1], 10) - 1;
-          monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'][mIdx] || ("M" + r);
+          monthName = monthNames[mIdx] || ("M" + (monthlyData.length + 1));
         }
+
+        const dateStr = row[0] instanceof Date && !isNaN(row[0].getTime())
+          ? row[0].toISOString().slice(0, 10)
+          : String(row[0]).substring(0, 10);
 
         monthlyData.push({
           month: monthName,
-          period: String(row[0]).substring(0, 10),
+          period: dateStr,
           deliveries: del,
           liveBirths: live,
           deaths: death,
-          deathReason: row[4] ? String(row[4]) : 'None',
+          deathReason: row[4] ? String(row[4]).trim() : 'None',
           cs: cs,
           svd: svd
         });
@@ -725,32 +748,94 @@ const ExcelDataParser = {
 
     if (monthlyData.length > 0) {
       HOSPITAL_DATASETS['2026'].maternity.monthly = monthlyData;
+      const liveTotal = monthlyData.reduce((a, b) => a + b.liveBirths, 0);
+      const csTotal = monthlyData.reduce((a, b) => a + b.cs, 0);
+      const svdTotal = monthlyData.reduce((a, b) => a + b.svd, 0);
+      const mCount = monthlyData.length;
+      const yrLabel = `2026 (${mCount}M)`;
+
       // Sync 2026 maternity totals into historical
       HISTORICAL_MULTI_YEAR.annualTotals.deliveries[7] = totalDeliveries;
-      HISTORICAL_MULTI_YEAR.annualTotals.liveBirths[7] = monthlyData.reduce((a, b) => a + b.liveBirths, 0);
-      HISTORICAL_MULTI_YEAR.annualTotals.cs[7] = monthlyData.reduce((a, b) => a + b.cs, 0);
-      HISTORICAL_MULTI_YEAR.annualTotals.svd[7] = monthlyData.reduce((a, b) => a + b.svd, 0);
+      HISTORICAL_MULTI_YEAR.annualTotals.liveBirths[7] = liveTotal;
+      HISTORICAL_MULTI_YEAR.annualTotals.cs[7] = csTotal;
+      HISTORICAL_MULTI_YEAR.annualTotals.svd[7] = svdTotal;
+      HISTORICAL_MULTI_YEAR.years[7] = yrLabel;
+      HISTORICAL_MULTI_YEAR.patientYears[7] = yrLabel;
+
+      // Update cumulative summary
+      const cum = HISTORICAL_MULTI_YEAR.cumulativeSummary;
+      cum.totalDeliveries = HISTORICAL_MULTI_YEAR.annualTotals.deliveries.reduce((a, b) => a + b, 0);
+      cum.totalLiveBirths = HISTORICAL_MULTI_YEAR.annualTotals.liveBirths.reduce((a, b) => a + b, 0);
+      cum.totalCS = HISTORICAL_MULTI_YEAR.annualTotals.cs.reduce((a, b) => a + b, 0);
+      cum.totalSVD = HISTORICAL_MULTI_YEAR.annualTotals.svd.reduce((a, b) => a + b, 0);
+      cum.allTimeCSRate = cum.totalDeliveries > 0 ? parseFloat(((cum.totalCS / cum.totalDeliveries) * 100).toFixed(1)) : 0;
+
+      // Update historical item in datasets
+      ['2026', '2025'].forEach(y => {
+        if (HOSPITAL_DATASETS[y] && HOSPITAL_DATASETS[y].maternity && HOSPITAL_DATASETS[y].maternity.historical) {
+          const histItem = HOSPITAL_DATASETS[y].maternity.historical.find(h => h.year.startsWith('2026'));
+          if (histItem) {
+            histItem.year = yrLabel;
+            histItem.deliveries = totalDeliveries;
+            histItem.liveBirths = liveTotal;
+            histItem.cs = csTotal;
+            histItem.svd = svdTotal;
+          }
+        }
+      });
     }
     return totalDeliveries;
   },
 
   parse2026Death(rows) {
     const deaths = [];
-    for (let r = 1; r < rows.length; r++) {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    // Detect header row
+    let headerRowIdx = -1;
+    for (let r = 0; r < Math.min(rows.length, 12); r++) {
       const row = rows[r] || [];
-      if (!row[0] || String(row[0]).toUpperCase().includes('TOTAL')) continue;
+      const c0 = String(row[0] || '').trim().toUpperCase();
+      const c1 = String(row[1] || '').trim().toUpperCase();
+      if ((c0.includes('MONTH') || c0.includes('PERIOD') || c0.includes('DATE')) && 
+          (c1.includes('DEATH') || c1.includes('FACILITY') || c1.includes('HF'))) {
+        headerRowIdx = r;
+        break;
+      }
+    }
+
+    if (headerRowIdx === -1) {
+      headerRowIdx = 0;
+    }
+
+    for (let r = headerRowIdx + 1; r < rows.length; r++) {
+      const row = rows[r] || [];
+      if (!row[0] || String(row[0]).toUpperCase().includes('TOTAL')) break;
+
       const count = Number(row[1]) || 0;
       if (count > 0) {
         let mName = "Month";
-        if (row[0] instanceof Date) {
-          mName = row[0].toLocaleString('default', { month: 'short' });
+        if (row[0] instanceof Date && !isNaN(row[0].getTime())) {
+          mName = monthNames[row[0].getMonth()] || row[0].toLocaleString('en-US', { month: 'short' });
+        } else if (typeof row[0] === 'string' && row[0].includes('-')) {
+          const parts = row[0].split('-');
+          const mIdx = parseInt(parts[1], 10) - 1;
+          mName = monthNames[mIdx] || "Month";
         }
+
+        const dateStr = row[0] instanceof Date && !isNaN(row[0].getTime())
+          ? row[0].toISOString().slice(0, 10)
+          : String(row[0]).substring(0, 10);
+
+        let dept = row[3] ? String(row[3]).trim() : "General";
+        if (dept.toLowerCase().includes('internal')) dept = 'Internal Medicine';
+
         deaths.push({
-          date: String(row[0]).substring(0, 10),
+          date: dateStr,
           month: mName,
           count: count,
           age: row[2] !== undefined && row[2] !== null ? String(row[2]) : "Unspecified",
-          department: row[3] ? String(row[3]).trim() : "General",
+          department: dept,
           circumstance: row[4] ? String(row[4]).trim() : "Unspecified",
           category: "Clinical",
           severity: "high"

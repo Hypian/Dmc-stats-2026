@@ -210,11 +210,12 @@ const HospitalApp = {
     const alertSafety = document.getElementById('alertTextSafety');
     if (alertSafety) {
       if (yearKey === '2026') {
-        const reportedMonths = hospitalData.metadata.months.slice(0, 8).map((_, index) => index);
+        const reportedMonths = hospitalData.metadata.months.map((_, index) => index);
         const deaths = HospitalAnalytics.getDeathsTotal(reportedMonths);
         const admissions = HospitalAnalytics.getIPDTotal(reportedMonths);
         const mortalityRate = admissions > 0 ? ((deaths / admissions) * 100).toFixed(2) : '0.00';
-        alertSafety.innerHTML = `<strong>Facility Inpatient Safety (Jan–Aug):</strong> <strong>${deaths} in-facility deaths</strong> recorded across ${admissions.toLocaleString()} Jan–Aug inpatient admissions (${mortalityRate}% mortality rate): 4 stillbirths macerated in Maternity, 1 internal medicine, 1 emergency.`;
+        const lastMonth = hospitalData.metadata.months[hospitalData.metadata.months.length - 1] || 'Sep';
+        alertSafety.innerHTML = `<strong>Facility Inpatient Safety (Jan–${lastMonth}):</strong> <strong>${deaths} in-facility deaths</strong> recorded across ${admissions.toLocaleString()} Jan–${lastMonth} inpatient admissions (${mortalityRate}% mortality rate): 5 stillbirths macerated in Maternity, 1 internal medicine, 1 emergency.`;
       } else {
         alertSafety.innerHTML = `<strong>Annual Clinical Inflow (${hospitalData.metadata.year}):</strong> <strong>${opdTot.toLocaleString()} Outpatient consultations</strong> and <strong>${ipdTot.toLocaleString()} Inpatient admissions</strong> recorded across all departments (${hospitalData.metadata.sourceFile}).`;
       }
@@ -515,6 +516,10 @@ const HospitalApp = {
       this.currentFilter.periodFilter = 7; // August
       this.currentFilter.monthIndex = 7;
       if (monthSelect) monthSelect.value = '7';
+    } else if (period === 'sep') {
+      this.currentFilter.periodFilter = 8; // September
+      this.currentFilter.monthIndex = 8;
+      if (monthSelect) monthSelect.value = '8';
     } else {
       const idx = parseInt(period, 10);
       if (!isNaN(idx) && idx >= 0 && idx < numMonths) {

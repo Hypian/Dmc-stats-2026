@@ -1,7 +1,7 @@
 /**
  * DMC Hospital Statistics Dashboard - Multi-Year Real Excel Data Store
  * Sources:
- * 1. DMC_Patient_Statistics 2026 YTD.xlsx (Jan - Sep 2026 outpatient and inpatient)
+ * 1. DMC_Patient_Statistics 2026 YTD.xlsx (Jan - Sep 2026 outpatient, inpatient, maternity, and mortality)
  * 2. PATIENTS NUMBERS 2025.xlsx (Jan - Dec 2025)
  * 3. PATIENTS NUMBERS 2019-2024.xlsx (Annual 2019 - 2024)
  * 
@@ -19,7 +19,7 @@ const HOSPITAL_DATASETS = {
       periodBadge: 'Jan 01 – Sep 30, 2026',
       months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
       allMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-      lastUpdated: '2026-10-04',
+      lastUpdated: '2026-10-06',
       sourceFile: 'DMC_Patient_Statistics 2026 YTD.xlsx',
       hasMortality: true,
       hasMonthlyMaternity: true
@@ -55,11 +55,12 @@ const HOSPITAL_DATASETS = {
         { month: 'Jan', period: '2026-01-31', deliveries: 116, liveBirths: 115, deaths: 1, deathReason: 'Still births macerated', cs: 61, svd: 55 },
         { month: 'Feb', period: '2026-02-28', deliveries: 114, liveBirths: 115, deaths: 0, deathReason: 'None', cs: 59, svd: 55 },
         { month: 'Mar', period: '2026-03-31', deliveries: 135, liveBirths: 135, deaths: 0, deathReason: 'None', cs: 82, svd: 53 },
-        { month: 'Apr', period: '2026-04-30', deliveries: 132, liveBirths: 135, deaths: 0, deathReason: 'None', cs: 72, svd: 61 },
+        { month: 'Apr', period: '2026-04-30', deliveries: 132, liveBirths: 135, deaths: 0, deathReason: 'None', cs: 72, svd: 60 },
         { month: 'May', period: '2026-05-31', deliveries: 133, liveBirths: 137, deaths: 0, deathReason: 'None', cs: 62, svd: 71 },
         { month: 'Jun', period: '2026-06-30', deliveries: 112, liveBirths: 115, deaths: 0, deathReason: 'None', cs: 72, svd: 40 },
         { month: 'Jul', period: '2026-07-31', deliveries: 126, liveBirths: 125, deaths: 2, deathReason: 'Still births macerated', cs: 75, svd: 51 },
-        { month: 'Aug', period: '2026-08-31', deliveries: 100, liveBirths: 100, deaths: 1, deathReason: 'Still births macerated', cs: 60, svd: 40 }
+        { month: 'Aug', period: '2026-08-31', deliveries: 100, liveBirths: 100, deaths: 1, deathReason: 'Still births macerated', cs: 60, svd: 40 },
+        { month: 'Sep', period: '2026-09-30', deliveries: 147, liveBirths: 149, deaths: 1, deathReason: 'Still births macerated', cs: 80, svd: 67 }
       ],
       historical: [
         { year: '2019', deliveries: 109, liveBirths: 149, cs: 99, svd: 10 },
@@ -69,15 +70,16 @@ const HOSPITAL_DATASETS = {
         { year: '2023', deliveries: 1252, liveBirths: 1248, cs: 779, svd: 473 },
         { year: '2024', deliveries: 1441, liveBirths: 1444, cs: 854, svd: 587 },
         { year: '2025', deliveries: 1437, liveBirths: 1439, cs: 824, svd: 613 },
-        { year: '2026 (8M)', deliveries: 968, liveBirths: 977, cs: 543, svd: 426 }
+        { year: '2026 (9M)', deliveries: 1115, liveBirths: 1126, cs: 623, svd: 492 }
       ]
     },
     mortality: [
       { date: '2026-01-31', month: 'Jan', count: 1, age: '0', department: 'Maternity', circumstance: 'Still births macerated' },
-      { date: '2026-05-31', month: 'May', count: 1, age: 'Unspecified', department: 'Internal medecine', circumstance: 'Natural disease ( cancer)' },
+      { date: '2026-05-31', month: 'May', count: 1, age: 'Unspecified', department: 'Internal Medicine', circumstance: 'Natural disease (cancer)' },
       { date: '2026-06-30', month: 'Jun', count: 1, age: 'Unspecified', department: 'Emergency', circumstance: 'Natural disease' },
       { date: '2026-07-31', month: 'Jul', count: 2, age: '0', department: 'Maternity', circumstance: 'Still births macerated' },
-      { date: '2026-08-31', month: 'Aug', count: 1, age: '0', department: 'Maternity', circumstance: 'Still births macerated' }
+      { date: '2026-08-31', month: 'Aug', count: 1, age: '0', department: 'Maternity', circumstance: 'Still births macerated' },
+      { date: '2026-09-30', month: 'Sep', count: 1, age: '0', department: 'Maternity', circumstance: 'Still births macerated' }
     ]
   },
 
@@ -131,7 +133,7 @@ const HOSPITAL_DATASETS = {
         { year: '2023', deliveries: 1252, liveBirths: 1248, cs: 779, svd: 473 },
         { year: '2024', deliveries: 1441, liveBirths: 1444, cs: 854, svd: 587 },
         { year: '2025', deliveries: 1437, liveBirths: 1439, cs: 824, svd: 613 },
-        { year: '2026 (8M)', deliveries: 968, liveBirths: 977, cs: 543, svd: 426 }
+        { year: '2026 (9M)', deliveries: 1115, liveBirths: 1126, cs: 623, svd: 492 }
       ]
     },
     mortality: []
@@ -140,25 +142,25 @@ const HOSPITAL_DATASETS = {
 
 // Master 8-Year Multi-Year Historical Matrix (2019 - 2026)
 const HISTORICAL_MULTI_YEAR = {
-  years: ['2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026 (8M)'],
+  years: ['2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026 (9M)'],
   patientYears: ['2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026 (9M)'],
   annualTotals: {
     opd: [12540, 34068, 66165, 67518, 75117, 85646, 101576, 72334], // sum = 514,964
     ipd: [569, 1662, 2265, 3045, 3255, 3686, 4302, 3495],            // sum = 22,279
-    deliveries: [109, 669, 898, 1141, 1252, 1441, 1437, 968],       // sum = 7,915
-    liveBirths: [149, 664, 900, 1137, 1248, 1444, 1439, 977],       // sum = 7,958
-    cs: [99, 457, 547, 738, 779, 854, 824, 543],                    // sum = 4,841
-    svd: [10, 212, 351, 403, 473, 587, 613, 426]                    // sum = 3,075
+    deliveries: [109, 669, 898, 1141, 1252, 1441, 1437, 1115],       // sum = 8,062
+    liveBirths: [149, 664, 900, 1137, 1248, 1444, 1439, 1126],       // sum = 8,107
+    cs: [99, 457, 547, 738, 779, 854, 824, 623],                    // sum = 4,921
+    svd: [10, 212, 351, 403, 473, 587, 613, 492]                    // sum = 3,141
   },
   cumulativeSummary: {
     totalOPD: 514964,
     totalIPD: 22279,
-    totalDeliveries: 7915,
-    totalLiveBirths: 7958,
-    totalCS: 4841,
-    totalSVD: 3075,
+    totalDeliveries: 8062,
+    totalLiveBirths: 8107,
+    totalCS: 4921,
+    totalSVD: 3141,
     totalPatientsServed: 537243, // 514,964 OPD + 22,279 IPD
-    allTimeCSRate: 61.2
+    allTimeCSRate: 61.0
   },
   opdDepartments: [
     { name: 'PEDIATRICS', years: [3446, 9210, 15192, 19386, 18868, 17527, 19455, 12878], total: 115962, color: '#2563EB' },
@@ -242,7 +244,7 @@ const HISTORICAL_MULTI_YEAR = {
         { year: '2023', deliveries: 1252, liveBirths: 1248, cs: 779, svd: 473 },
         { year: '2024', deliveries: 1441, liveBirths: 1444, cs: 854, svd: 587 },
         { year: '2025', deliveries: 1437, liveBirths: 1439, cs: 824, svd: 613 },
-        { year: '2026 (8M)', deliveries: 968, liveBirths: 977, cs: 543, svd: 426 }
+        { year: '2026 (9M)', deliveries: 1115, liveBirths: 1126, cs: 623, svd: 492 }
       ]
     },
     mortality: []

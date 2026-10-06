@@ -373,6 +373,7 @@ const HospitalCharts = {
 
     const colorMap = {
       'Maternity (Still births macerated)': '#E84A2D',
+      'Internal Medicine (Natural disease (cancer))': '#3D3532',
       'Internal medecine (Natural disease ( cancer))': '#3D3532',
       'Emergency (Natural disease)': '#71645B'
     };
@@ -782,10 +783,10 @@ const HospitalCharts = {
     this.createSparkline('ipdSparkline', hospitalData.metadata.months.map((_, i) => HospitalAnalytics.getIPDTotal(i)), '#2563EB');
     const delData = (hospitalData.maternity.monthly && hospitalData.maternity.monthly.length > 0)
       ? hospitalData.maternity.monthly.map(m => m.deliveries)
-      : [109, 669, 898, 1141, 1252, 1441, 1437, 968];
+      : [109, 669, 898, 1141, 1252, 1441, 1437, 1115];
     const csData = (hospitalData.maternity.monthly && hospitalData.maternity.monthly.length > 0)
       ? hospitalData.maternity.monthly.map(m => m.cs)
-      : [99, 457, 547, 738, 779, 854, 824, 543];
+      : [99, 457, 547, 738, 779, 854, 824, 623];
     this.createSparkline('delSparkline', delData, '#10B981');
     this.createSparkline('csSparkline', csData, '#F97316');
   },
