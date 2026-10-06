@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Dream Medical Center Hospital — Clinical Statistics & Performance Dashboard 2026</title>
-  <meta name="description" content="Official executive dashboard for Dream Medical Center Hospital displaying patient admissions, department performance, maternity outcomes, and mortality records from Excel.">
+  <meta name="description"
+    content="Official executive dashboard for Dream Medical Center Hospital displaying patient admissions, department performance, maternity outcomes, and mortality records from Excel.">
   <link rel="icon" type="image/png" href="assets/logo_icon.png">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Poppins:wght@600;700;800&display=swap"
+    rel="stylesheet">
 
   <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <!-- Core & Component Stylesheets -->
   <link rel="stylesheet" href="css/main.css">
@@ -25,6 +31,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
+
 <body>
 
   <!-- Floating Toast Notifications Container -->
@@ -33,12 +40,17 @@
   <!-- App Wrapper: Non-overlapping Flexbox Layout -->
   <div class="app-wrapper">
 
+    <!-- Mobile Sidebar Overlay Backdrop -->
+    <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
     <!-- Left Sticky Sidebar Navigation -->
     <aside class="app-sidebar" aria-label="Main Navigation">
       <div class="sidebar-brand">
         <div class="brand-logo-wrapper">
-          <img src="assets/logo_transparent.png" alt="Dream Medical Center Hospital" class="brand-logo-img logo-light-mode">
-          <img src="assets/logo_dark_mode.png" alt="Dream Medical Center Hospital" class="brand-logo-img logo-dark-mode">
+          <img src="assets/logo_transparent.png" alt="Dream Medical Center Hospital"
+            class="brand-logo-img logo-light-mode">
+          <img src="assets/logo_dark_mode.png" alt="Dream Medical Center Hospital"
+            class="brand-logo-img logo-dark-mode">
         </div>
       </div>
 
@@ -92,20 +104,24 @@
           <div class="header-title">
             <h1>Dream Medical Center Hospital — Statistics Dashboard</h1>
             <div class="header-meta">
-              <span id="headerDateRange"><i class="fas fa-calendar-alt"></i> <span id="headerDateRangeText">Jan 01 – Sep 30, 2026</span></span>
+              <span id="headerDateRange"><i class="fas fa-calendar-alt"></i> <span id="headerDateRangeText">Jan 01 – Sep
+                  30, 2026</span></span>
               <span><i class="fas fa-clock"></i> <span id="liveClockText">Live</span></span>
-              <span><i class="fas fa-file-excel"></i> <code id="headerSourceFileText">DMC_Patient_Statistics 2026 YTD.xlsx</code></span>
+              <span><i class="fas fa-file-excel"></i> <code
+                  id="headerSourceFileText">DMC_Patient_Statistics 2026 YTD.xlsx</code></span>
             </div>
           </div>
         </div>
 
         <div class="header-right">
           <!-- Excel Upload Button (Hidden for future release) -->
-          <button id="openUploadModalBtn" class="btn btn-outline" title="Import Excel Workbook" style="display: none; align-items: center; gap: 6px; font-size: 0.8125rem;">
+          <button id="openUploadModalBtn" class="btn btn-outline" title="Import Excel Workbook"
+            style="display: none; align-items: center; gap: 6px; font-size: 0.8125rem;">
             <i class="fas fa-file-excel" style="color: #10B981;"></i> <span>Import Excel</span>
           </button>
           <!-- Dark / Light Theme Toggle -->
-          <button id="themeToggleBtn" class="btn btn-outline btn-icon-only" aria-label="Toggle color theme" title="Toggle theme">
+          <button id="themeToggleBtn" class="btn btn-outline btn-icon-only" aria-label="Toggle color theme"
+            title="Toggle theme">
             <i class="fas fa-moon"></i>
           </button>
         </div>
@@ -128,7 +144,8 @@
               <button type="button" class="preset-pill" data-year="2021">2021</button>
               <button type="button" class="preset-pill" data-year="2020">2020</button>
               <button type="button" class="preset-pill" data-year="2019">2019</button>
-              <button type="button" class="preset-pill" data-year="multi"><i class="fas fa-chart-line"></i> Multi-Year (2019–2026)</button>
+              <button type="button" class="preset-pill" data-year="multi"><i class="fas fa-chart-line"></i> Multi-Year
+                (2019–2026)</button>
             </div>
           </div>
 
@@ -187,20 +204,25 @@
               <div class="alert-content">
                 <i class="fas fa-exclamation-triangle fa-lg"></i>
                 <div id="alertTextMaternity">
-                  <strong>Obstetric Delivery Notice:</strong> Caesarean Section rate is <strong>55.9%</strong> (623 CS of 1,115 deliveries) vs <strong>44.1%</strong> Spontaneous Vaginal Delivery (492 SVD).
+                  <strong>Obstetric Delivery Notice:</strong> Caesarean Section rate is <strong>55.9%</strong> (623 CS
+                  of 1,115 deliveries) vs <strong>44.1%</strong> Spontaneous Vaginal Delivery (492 SVD).
                 </div>
               </div>
-              <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss alert">&times;</button>
+              <button class="alert-dismiss" onclick="this.parentElement.remove()"
+                aria-label="Dismiss alert">&times;</button>
             </div>
 
             <div class="alert-card alert-info" id="alertCardSafety">
               <div class="alert-content">
                 <i class="fas fa-circle-info fa-lg"></i>
                 <div id="alertTextSafety">
-                  <strong>Facility Inpatient Safety (Jan–Sep):</strong> <strong>7 in-facility deaths</strong> recorded across 3,495 Jan–Sep inpatient admissions (0.20% mortality rate): 5 stillbirths macerated in Maternity, 1 internal medicine, 1 emergency.
+                  <strong>Facility Inpatient Safety (Jan–Sep):</strong> <strong>7 in-facility deaths</strong> recorded
+                  across 3,495 Jan–Sep inpatient admissions (0.20% mortality rate): 5 stillbirths macerated in
+                  Maternity, 1 internal medicine, 1 emergency.
                 </div>
               </div>
-              <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss alert">&times;</button>
+              <button class="alert-dismiss" onclick="this.parentElement.remove()"
+                aria-label="Dismiss alert">&times;</button>
             </div>
           </section>
 
@@ -318,7 +340,8 @@
                   <p id="outpatientDonutSubtext">Volume distribution of 72,334 patient visits (Sheet 1)</p>
                 </div>
                 <div class="chart-card-actions">
-                  <button class="btn-chart-action" onclick="HospitalApp.switchTab('outpatient')">View All Services</button>
+                  <button class="btn-chart-action" onclick="HospitalApp.switchTab('outpatient')">View All
+                    Services</button>
                 </div>
               </div>
               <div class="donut-container">
@@ -333,7 +356,8 @@
             <div class="chart-card-header">
               <div class="chart-card-title">
                 <h3 id="trajectoryChartTitle">Monthly Patient Inflow Trajectory (Jan – Sep 2026)</h3>
-                <p id="trajectoryChartSubtext">Outpatient Consultations (left scale) vs Inpatient Admissions (right scale)</p>
+                <p id="trajectoryChartSubtext">Outpatient Consultations (left scale) vs Inpatient Admissions (right
+                  scale)</p>
               </div>
             </div>
             <div style="height: 310px; width: 100%;">
@@ -350,7 +374,8 @@
             <div class="chart-card-header">
               <div class="chart-card-title">
                 <h3 id="ipdRankingTitle">Inpatient Department Volumes & Rankings (Jan–Sep 2026)</h3>
-                <p id="ipdRankingSubtext">Total admissions per specialized ward extracted directly from Sheet: INPATIENT PER DEPARTEMENT</p>
+                <p id="ipdRankingSubtext">Total admissions per specialized ward extracted directly from Sheet: INPATIENT
+                  PER DEPARTEMENT</p>
               </div>
               <div class="chart-card-actions">
                 <span class="kpi-badge badge-positive" id="ipdBadgeRankingTotal">Total: 3,495 Admissions</span>
@@ -385,7 +410,8 @@
             <div class="chart-card-header">
               <div class="chart-card-title">
                 <h3 id="opdRankingTitle">Outpatient Department Volume Rankings</h3>
-                <p id="opdRankingSubtext">Total consultations across all 13 outpatient services (Sheet 1: 72,334 visits)</p>
+                <p id="opdRankingSubtext">Total consultations across all 13 outpatient services (Sheet 1: 72,334 visits)
+                </p>
               </div>
               <div class="chart-card-actions">
                 <span class="kpi-badge badge-positive" id="opdBadgeRankingTotal">Total: 72,334 Visits</span>
@@ -416,22 +442,85 @@
              TAB 4: MATERNITY & DELIVERIES VIEW
              ================================================================== -->
         <div id="tab-insurers" class="dashboard-tab-panel tab-hidden">
-          <section class="section-heading"><div><h2>Insurer Distribution</h2><p id="insurerPeriodText">November 2018 – September 17, 2026</p></div></section>
+          <section class="section-heading">
+            <div>
+              <h2>Insurer Distribution</h2>
+              <p id="insurerPeriodText">November 2018 – September 17, 2026</p>
+            </div>
+          </section>
           <section class="kpi-grid insurer-kpis">
-            <article class="kpi-card accent-primary"><span class="kpi-title">Inpatient Admissions</span><strong class="kpi-value" id="insurerIPDTotal">—</strong><span class="kpi-subtext" id="insurerIPDCount">Loading insurers</span></article>
-            <article class="kpi-card accent-secondary"><span class="kpi-title">Outpatient Consultations</span><strong class="kpi-value" id="insurerOPDTotal">—</strong><span class="kpi-subtext" id="insurerOPDCount">Loading insurers</span></article>
+            <article class="kpi-card accent-primary"><span class="kpi-title">Inpatient Admissions</span><strong
+                class="kpi-value" id="insurerIPDTotal">—</strong><span class="kpi-subtext" id="insurerIPDCount">Loading
+                insurers</span></article>
+            <article class="kpi-card accent-secondary"><span class="kpi-title">Outpatient Consultations</span><strong
+                class="kpi-value" id="insurerOPDTotal">—</strong><span class="kpi-subtext" id="insurerOPDCount">Loading
+                insurers</span></article>
           </section>
           <section class="analytics-grid-2col">
-            <div class="chart-card"><div class="chart-card-header"><div class="chart-card-title"><h3>Inpatient payer share</h3><p>Top insurers and all remaining insurers</p></div></div><div class="donut-container"><canvas id="insurerIPDDonutChart"></canvas></div><div id="insurerIPDLegend" class="donut-legend-custom"></div></div>
-            <div class="chart-card"><div class="chart-card-header"><div class="chart-card-title"><h3>Outpatient payer share</h3><p>Top insurers and all remaining insurers</p></div></div><div class="donut-container"><canvas id="insurerOPDDonutChart"></canvas></div><div id="insurerOPDLegend" class="donut-legend-custom"></div></div>
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <h3>Inpatient payer share</h3>
+                  <p>Top insurers and all remaining insurers</p>
+                </div>
+              </div>
+              <div class="donut-container"><canvas id="insurerIPDDonutChart"></canvas></div>
+              <div id="insurerIPDLegend" class="donut-legend-custom"></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <h3>Outpatient payer share</h3>
+                  <p>Top insurers and all remaining insurers</p>
+                </div>
+              </div>
+              <div class="donut-container"><canvas id="insurerOPDDonutChart"></canvas></div>
+              <div id="insurerOPDLegend" class="donut-legend-custom"></div>
+            </div>
           </section>
           <section class="analytics-grid-2col">
-            <div class="chart-card"><div class="chart-card-header"><div class="chart-card-title"><h3>Leading inpatient insurers</h3><p>Admissions</p></div></div><div style="height: 320px; width: 100%;"><canvas id="insurerIPDBarChart"></canvas></div></div>
-            <div class="chart-card"><div class="chart-card-header"><div class="chart-card-title"><h3>Leading outpatient insurers</h3><p>Consultations</p></div></div><div style="height: 340px; width: 100%;"><canvas id="insurerOPDBarChart"></canvas></div></div>
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <h3>Leading inpatient insurers</h3>
+                  <p>Admissions</p>
+                </div>
+              </div>
+              <div style="height: 320px; width: 100%;"><canvas id="insurerIPDBarChart"></canvas></div>
+            </div>
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div class="chart-card-title">
+                  <h3>Leading outpatient insurers</h3>
+                  <p>Consultations</p>
+                </div>
+              </div>
+              <div style="height: 340px; width: 100%;"><canvas id="insurerOPDBarChart"></canvas></div>
+            </div>
           </section>
           <section class="analytics-grid-2col insurer-tables">
-            <article class="chart-card table-card"><div class="chart-card-header"><div><h3>Inpatient insurers</h3><p>Admissions by insurer</p></div></div><div class="table-responsive"><table class="hospital-table" id="insurerInpatientTable"></table></div></article>
-            <article class="chart-card table-card"><div class="chart-card-header"><div><h3>Outpatient insurers</h3><p>Consultations by insurer</p></div></div><div class="table-responsive"><table class="hospital-table" id="insurerOutpatientTable"></table></div></article>
+            <article class="chart-card table-card">
+              <div class="chart-card-header">
+                <div>
+                  <h3>Inpatient insurers</h3>
+                  <p>Admissions by insurer</p>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="hospital-table" id="insurerInpatientTable"></table>
+              </div>
+            </article>
+            <article class="chart-card table-card">
+              <div class="chart-card-header">
+                <div>
+                  <h3>Outpatient insurers</h3>
+                  <p>Consultations by insurer</p>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="hospital-table" id="insurerOutpatientTable"></table>
+              </div>
+            </article>
           </section>
         </div>
 
@@ -557,7 +646,8 @@
                   <button id="tabTableIPD" class="preset-pill">Inpatient (9 Depts)</button>
                 </div>
                 <!-- Actions (Hidden for future release) -->
-                <button id="printTableBtn" class="btn btn-outline" onclick="window.print()" title="Print table" style="display: none;">
+                <button id="printTableBtn" class="btn btn-outline" onclick="window.print()" title="Print table"
+                  style="display: none;">
                   <i class="fas fa-print"></i> Print
                 </button>
                 <button id="exportExcelBtn" class="btn btn-outline" title="Export to Excel" style="display: none;">
@@ -743,7 +833,8 @@
         </div>
         <div class="footer-source">
           <i class="fas fa-database"></i>
-          <span>Source File: <code id="footerSourceFileText">DMC_Patient_Statistics 2026 YTD.xlsx</code> · Verified Accurate</span>
+          <span>Source File: <code id="footerSourceFileText">DMC_Patient_Statistics 2026 YTD.xlsx</code> · Verified
+            Accurate</span>
         </div>
       </footer>
 
@@ -754,7 +845,8 @@
   <div class="modal-overlay" id="uploadModal" role="dialog" aria-modal="true" aria-labelledby="uploadModalTitle">
     <div class="modal-container">
       <div class="modal-header">
-        <h3 id="uploadModalTitle"><i class="fas fa-file-excel" style="color: #16A085;"></i> Import Hospital Excel File</h3>
+        <h3 id="uploadModalTitle"><i class="fas fa-file-excel" style="color: #16A085;"></i> Import Hospital Excel File
+        </h3>
         <button class="modal-close-btn" id="closeUploadModalBtn" aria-label="Close modal">&times;</button>
       </div>
       <div class="modal-body">
@@ -764,7 +856,8 @@
           <code>PATIENTS STATISTICS - JAN TO AUG 2026.xlsx</code>,
           <code>PATIENTS NUMBERS 2025.xlsx</code>, or
           <code>PATIENTS NUMBERS 2019-2024.xlsx</code>.
-          The dashboard will auto-detect the file structure, recalculate all clinical statistics, and switch to the relevant view.
+          The dashboard will auto-detect the file structure, recalculate all clinical statistics, and switch to the
+          relevant view.
         </p>
 
         <div class="dropzone-box" id="excelDropZone" onclick="document.getElementById('excelFileInput').click()">
@@ -772,20 +865,26 @@
             <i class="fas fa-cloud-arrow-up"></i>
           </div>
           <h4 style="margin-bottom: 6px;">Drag and drop your Excel file here</h4>
-          <p style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 14px;">Supports .xlsx, .xls, or .csv formats</p>
+          <p style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 14px;">Supports .xlsx, .xls, or .csv
+            formats</p>
           <button type="button" class="btn btn-secondary">
             <i class="fas fa-folder-open"></i> Browse Local Files
           </button>
           <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display: none;">
         </div>
 
-        <div style="margin-top: 20px; font-size: 0.8rem; color: var(--text-muted); background: var(--bg-surface-alt); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
+        <div
+          style="margin-top: 20px; font-size: 0.8rem; color: var(--text-muted); background: var(--bg-surface-alt); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-light);">
           <strong><i class="fas fa-check-circle" style="color: #16A085;"></i> Recognized Workbook Formats:</strong>
           <ul style="margin: 6px 0 0 20px; line-height: 1.6;">
-            <li><strong>2026 YTD Workbook (New Format)</strong>: <code>Outpatient</code>, <code>Inpatient</code>, <code>Babies</code>, <code>Deaths</code></li>
-            <li><strong>2026 Monthly Workbook (Legacy)</strong>: <code>OUT PATIENT PER DEPARTEMENT</code>, <code>INPATIENT PER DEPARTEMENT</code>, <code>BABIES TOTAL</code>, <code>Death</code></li>
-            <li><strong>2025 12-Month Workbook</strong>: <code>OPD </code> (13 departments), <code>IP</code> (8 wards)</li>
-            <li><strong>2019–2024 Longitudinal Workbook</strong>: <code>OPD</code> (annual 2019–2024), <code>IP</code> (annual 2019–2024)</li>
+            <li><strong>2026 YTD Workbook (New Format)</strong>: <code>Outpatient</code>, <code>Inpatient</code>,
+              <code>Babies</code>, <code>Deaths</code></li>
+            <li><strong>2026 Monthly Workbook (Legacy)</strong>: <code>OUT PATIENT PER DEPARTEMENT</code>,
+              <code>INPATIENT PER DEPARTEMENT</code>, <code>BABIES TOTAL</code>, <code>Death</code></li>
+            <li><strong>2025 12-Month Workbook</strong>: <code>OPD </code> (13 departments), <code>IP</code> (8 wards)
+            </li>
+            <li><strong>2019–2024 Longitudinal Workbook</strong>: <code>OPD</code> (annual 2019–2024), <code>IP</code>
+              (annual 2019–2024)</li>
           </ul>
         </div>
       </div>
@@ -813,4 +912,5 @@
   <script src="js/app.js?v=20261006-1"></script>
 
 </body>
+
 </html>

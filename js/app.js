@@ -285,11 +285,47 @@ const HospitalApp = {
     // Mobile Sidebar Toggle
     const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
     const sidebar = document.querySelector('.app-sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    const openSidebar = () => {
+      sidebar.classList.add('sidebar-open');
+      if (sidebarOverlay) {
+        sidebarOverlay.classList.add('active');
+        sidebarOverlay.setAttribute('aria-hidden', 'false');
+      }
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeSidebar = () => {
+      sidebar.classList.remove('sidebar-open');
+      if (sidebarOverlay) {
+        sidebarOverlay.classList.remove('active');
+        sidebarOverlay.setAttribute('aria-hidden', 'true');
+      }
+      document.body.style.overflow = '';
+    };
+
     if (sidebarToggleBtn && sidebar) {
       sidebarToggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('sidebar-open');
+        if (sidebar.classList.contains('sidebar-open')) {
+          closeSidebar();
+        } else {
+          openSidebar();
+        }
       });
     }
+
+    // Close sidebar on overlay click
+    if (sidebarOverlay) {
+      sidebarOverlay.addEventListener('click', closeSidebar);
+    }
+
+    // Close sidebar when a nav link is clicked on mobile
+    document.querySelectorAll('.sidebar-menu li a[data-tab]').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth < 992) closeSidebar();
+      });
+    });
 
     // Bind Period Preset Buttons
     this.bindPeriodButtons();
